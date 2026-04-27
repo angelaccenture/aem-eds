@@ -4,23 +4,25 @@ const { log } = getConfig();
 
 let carouselInstanceId = 0;
 
-function updateNavButtons(prevBtn, nextBtn, activeIndex, total) {
-  prevBtn.disabled = activeIndex === 0;
-  nextBtn.disabled = activeIndex === total - 1;
-}
-
 function goToSlide(index, carouselList, carouselPanels, prevBtn, nextBtn) {
   const buttons = carouselList.querySelectorAll('.carousel-slide-indicator button');
+  if (!buttons[index]) return;
+
   buttons.forEach((button) => {
     button.classList.remove('is-active');
     button.setAttribute('aria-selected', 'false');
+    button.setAttribute('tabindex', '-1');
   });
   carouselPanels.forEach((sec) => { sec.classList.remove('is-visible'); });
 
   buttons[index].classList.add('is-active');
   buttons[index].setAttribute('aria-selected', 'true');
-  carouselPanels[index].classList.add('is-visible');
-  updateNavButtons(prevBtn, nextBtn, index, carouselPanels.length);
+  buttons[index].setAttribute('tabindex', '0');
+  carouselPanels[index]?.classList.add('is-visible');
+
+  const total = carouselPanels.length;
+  prevBtn.disabled = index === 0;
+  nextBtn.disabled = index === total - 1;
 }
 
 function getActiveIndex(carouselList) {
@@ -43,6 +45,7 @@ function getCarouselList(carousel, carouselPanels, instanceId) {
     btn.id = `carousel-${instanceId}-${idx + 1}`;
     btn.setAttribute('aria-controls', `carouselpanel-${instanceId}-${idx + 1}`);
     btn.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+    btn.setAttribute('tabindex', idx === 0 ? '0' : '-1');
     btn.textContent = item.textContent;
     if (idx === 0) {
       btn.classList.add('is-active');
@@ -51,6 +54,20 @@ function getCarouselList(carousel, carouselPanels, instanceId) {
     indicator.append(btn);
     carouselList.append(indicator);
   }
+
+  carouselList.addEventListener('keydown', (e) => {
+    const buttons = [...carouselList.querySelectorAll('.carousel-slide-indicator button')];
+    const current = buttons.findIndex((btn) => btn.classList.contains('is-active'));
+    let next;
+    if (e.key === 'ArrowRight') next = (current + 1) % buttons.length;
+    else if (e.key === 'ArrowLeft') next = (current - 1 + buttons.length) % buttons.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = buttons.length - 1;
+    else return;
+    e.preventDefault();
+    buttons[next]?.focus();
+  });
+
   return carouselList;
 }
 
@@ -74,10 +91,8 @@ function createNavButtons() {
   nextBtn.className = 'slide-next';
   nextBtn.setAttribute('aria-label', 'Next slide');
 
-  const playPauseBtn = createPlayPauseButton();
-
   nav.append(prevBtn, nextBtn);
-  return { nav, prevBtn, nextBtn, playPauseBtn };
+  return { nav, prevBtn, nextBtn };
 }
 
 export default function init(el) {
@@ -93,15 +108,11 @@ export default function init(el) {
   const currSection = el.closest('.section');
   currSection.classList.add('carouselSection');
 
-  // Count expected slides from the list items
   const carouselCount = carousel.querySelectorAll('li').length;
 
-  // Walk only immediately following sibling sections to collect slides
-  // This ensures each carousel only claims its own adjacent slides
   const carouselPanels = [];
   let sibling = currSection.nextElementSibling;
   while (sibling && carouselPanels.length < carouselCount) {
-    // Stop if we hit another container block (carousel or tabs)
     if (sibling.querySelector('.advanced-carousel, .advanced-tabs')) break;
 
     sibling.classList.add('carouselSection');
@@ -113,9 +124,9 @@ export default function init(el) {
   }
 
   const carouselList = getCarouselList(carousel, carouselPanels, instanceId);
-  const { nav, prevBtn, nextBtn, playPauseBtn } = createNavButtons();
+  const { nav, prevBtn, nextBtn } = createNavButtons();
+  const playPauseBtn = createPlayPauseButton();
 
-  // Autoplay
   const AUTOPLAY_INTERVAL = 6000;
   let autoplayTimer = null;
 
@@ -141,7 +152,6 @@ export default function init(el) {
     playPauseBtn.setAttribute('aria-label', 'Pause autoplay');
   }
 
-  // Wire up play/pause button
   playPauseBtn.addEventListener('click', () => {
     if (autoplayTimer) {
       stopAutoplay();
@@ -150,7 +160,6 @@ export default function init(el) {
     }
   });
 
-  // Wire up indicator button clicks
   carouselList.querySelectorAll('.carousel-slide-indicator button').forEach((btn, idx) => {
     btn.addEventListener('click', () => {
       stopAutoplay();
@@ -158,7 +167,6 @@ export default function init(el) {
     });
   });
 
-  // Wire up prev/next buttons
   prevBtn.addEventListener('click', () => {
     stopAutoplay();
     const activeIndex = getActiveIndex(carouselList);
@@ -176,12 +184,29 @@ export default function init(el) {
   });
 
   carousel.remove();
-  // Place indicators and play/pause between prev and next: [prev] [indicators] [play/pause] [next]
   const nextBtn2 = nav.querySelector('.slide-next');
   nav.insertBefore(carouselList, nextBtn2);
   nav.insertBefore(playPauseBtn, nextBtn2);
   el.append(...carouselPanels, nav);
 
-  // Start autoplay
   startAutoplay();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting && autoplayTimer) {
+        stopAutoplay();
+      } else if (entry.isIntersecting && !autoplayTimer) {
+        startAutoplay();
+      }
+    });
+  }, { threshold: 0.1 });
+  observer.observe(el);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && autoplayTimer) {
+      stopAutoplay();
+    } else if (!document.hidden && !autoplayTimer) {
+      startAutoplay();
+    }
+  });
 }
