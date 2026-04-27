@@ -188,6 +188,19 @@
   --body-font-size-xs: 12px;
   --body-line-height: 1.6;
 
+  /* semantic colors — block-level tokens */
+  --color-border: #e3e3e3;
+  --color-text-dark: #0e1726;
+  --color-text-secondary: #17253d;
+  --color-text-muted: #616161;
+  --color-control: #2a446f;
+  --color-interactive: #005597;
+  --color-cta: #0078d4;
+  --color-cta-hover: #0067b8;
+  --color-surface: #fff;
+  --color-surface-hover: #f0f0f0;
+  --color-indicator: #c4c4c4;
+
   /* misc */
   --header-height: 64px;
   --breadcrumb-height: 24px;

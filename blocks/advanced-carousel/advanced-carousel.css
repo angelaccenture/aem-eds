@@ -5,10 +5,6 @@
     &.is-visible {
       display: block;
     }
-
-    &[data-status="decorated"] {
-      display: none;
-    }
   }
 }
 
@@ -16,9 +12,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--spacing-s);
   margin: 0;
-  padding: 16px 0;
+  padding: var(--spacing-m) 0;
   height: 32px;
   list-style: none;
   background-color: transparent;
@@ -50,121 +46,14 @@
   }
 }
 
-
-
-
-
-/* Carousel — Microsoft-style */
-.advanced-carousel .carousel-slides-container {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.advanced-carousel .carousel-slides,
-.advanced-carousel .carousel-slide-indicators {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.advanced-carousel .carousel-slides {
-  display: flex;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  overflow: scroll clip;
-}
-
-.advanced-carousel .carousel-slides::-webkit-scrollbar {
-  display: none;
-}
-
-.advanced-carousel .carousel-slide {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  position: relative;
-  width: 100%;
-  min-height: min(50vw, calc(100dvh - var(--header-height)));
-}
-
-.advanced-carousel .carousel-slide:has(.carousel-slide-content[data-align='center']) {
-  align-items: center;
-}
-
-.advanced-carousel .carousel-slide:has(.carousel-slide-content[data-align='right']) {
-  align-items: flex-end;
-}
-
-.advanced-carousel .carousel-slide .carousel-slide-image picture {
-  position: absolute;
-  inset: 0;
-}
-
-.advanced-carousel .carousel-slide .carousel-slide-image picture > img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
-
-/* Content overlay — gradient instead of opaque box */
-.advanced-carousel .carousel-slide .carousel-slide-content {
-  z-index: 1;
-  margin: 0;
-  padding: 32px 40px 40px;
-  color: white;
-  background: linear-gradient(to top, rgb(14 23 38 / 95%) 0%, rgb(14 23 38 / 80%) 60%, transparent 100%);
-  position: relative;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.advanced-carousel .carousel-slide .carousel-slide-content h1,
-.advanced-carousel .carousel-slide .carousel-slide-content h2 {
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 40px;
-  margin: 0 0 8px;
-  color: white;
-}
-
-.advanced-carousel .carousel-slide .carousel-slide-content p {
-  font-size: 15px;
-  line-height: 22px;
-  margin: 0 0 16px;
-  color: rgb(255 255 255 / 85%);
-}
-
-/* CTA button — Microsoft style: white pill on dark slides */
-.advanced-carousel .carousel-slide .carousel-slide-content a {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 20px;
-  text-decoration: none;
-  background-color: #fff;
-  color: #0e1726;
-  border: 1px solid transparent;
-  transition: background-color 0.15s, color 0.15s;
-}
-
-.advanced-carousel .carousel-slide .carousel-slide-content a:hover {
-  background-color: rgb(255 255 255 / 85%);
-}
-
-/* Carousel controls — matches Microsoft carousel__controls */
+/* Carousel controls */
 .advanced-carousel .carousel-navigation-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--spacing-s);
   height: 32px;
-  padding: 16px 0;
+  padding: var(--spacing-m) 0;
   position: static;
   transform: none;
   z-index: 2;
@@ -178,10 +67,10 @@
   margin: 0;
   padding: 0;
   background-color: transparent;
-  border: 2px solid #2a446f;
+  border: 2px solid var(--color-control);
   border-radius: 200px;
   cursor: pointer;
-  color: #2a446f;
+  color: var(--color-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -202,7 +91,7 @@
 .advanced-carousel .carousel-navigation-buttons button::after {
   display: block;
   content: '';
-  border: 2px solid #2a446f;
+  border: 2px solid var(--color-control);
   border-bottom: 0;
   border-left: 0;
   height: 6px;
@@ -226,10 +115,10 @@
   margin: 0;
   padding: 0;
   background-color: transparent;
-  border: 2px solid #2a446f;
+  border: 2px solid var(--color-control);
   border-radius: 200px;
   cursor: pointer;
-  color: #2a446f;
+  color: var(--color-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -249,7 +138,7 @@
   display: block;
   width: 2px;
   height: 10px;
-  background-color: #2a446f;
+  background-color: var(--color-control);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -271,19 +160,19 @@
   height: 0;
   border-style: solid;
   border-width: 5px 0 5px 9px;
-  border-color: transparent transparent transparent #2a446f;
+  border-color: transparent transparent transparent var(--color-control);
   position: absolute;
   top: 50%;
   left: calc(50% + 1px);
   transform: translate(-50%, -50%);
 }
 
-/* Slide indicators — line/bar style centered between nav buttons */
+/* Slide indicators */
 .advanced-carousel .carousel-slide-indicators {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--spacing-xs);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -298,7 +187,7 @@
   padding: 0;
   border: none;
   border-radius: 2px;
-  background-color: #c4c4c4;
+  background-color: var(--color-indicator);
   transition: background-color 0.2s;
   font-size: 0;
   color: transparent;
@@ -312,36 +201,19 @@
 .advanced-carousel .carousel-slide-indicator button.is-active,
 .advanced-carousel .carousel-slide-indicator button:hover,
 .advanced-carousel .carousel-slide-indicator button:focus-visible {
-  background-color: #0e1726;
+  background-color: var(--color-text-dark);
 }
 
 @media (width >= 600px) {
   .advanced-carousel .carousel-navigation-buttons {
-    padding: 16px 64px;
-  }
-
-  .advanced-carousel .carousel-slide .carousel-slide-content {
-    width: 50%;
-    padding: 48px 60px 56px;
-  }
-
-  .advanced-carousel .carousel-slide .carousel-slide-content h1,
-  .advanced-carousel .carousel-slide .carousel-slide-content h2 {
-    font-size: 40px;
-    line-height: 48px;
-  }
-
-  .advanced-carousel .carousel-slide .carousel-slide-content[data-align='justify'] {
-    width: 100%;
+    padding: var(--spacing-m) 64px;
   }
 }
 
-/* Stories variation — arrows left, play/pause right, no indicators */
-
-/* Attribute selector handles both local preview class="(stories)" and DA production class="stories" */
+/* Stories variation */
 .advanced-carousel[class*="stories"] .carousel-navigation-buttons {
   justify-content: flex-start;
-  padding: 16px 0;
+  padding: var(--spacing-m) 0;
 }
 
 .advanced-carousel[class*="stories"] .carousel-slide-indicators {
@@ -361,7 +233,6 @@
   margin-left: auto;
 }
 
-/* Stories variant — vertical card layout (image top, text below) matching Microsoft.com */
 @media (width >= 768px) {
   .advanced-carousel[class*="stories"] .teaser {
     border-radius: 16px;
@@ -373,7 +244,7 @@
 
   .advanced-carousel[class*="stories"] .teaser .teaser-picture-container {
     flex: none;
-    padding: 8px 8px 0;
+    padding: var(--spacing-s) var(--spacing-s) 0;
 
     img {
       border-radius: 12px;
@@ -383,8 +254,8 @@
 
   .advanced-carousel[class*="stories"] .teaser .teaser-content-container {
     flex: none;
-    padding: 24px 24px 32px;
-    gap: 12px;
+    padding: var(--spacing-l) var(--spacing-l) var(--spacing-xl);
+    gap: var(--spacing-m);
     justify-content: flex-start;
   }
 }

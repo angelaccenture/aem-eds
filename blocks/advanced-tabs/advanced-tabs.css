@@ -5,10 +5,6 @@
     &.is-visible {
       display: block;
     }
-
-    &[data-status="decorated"] {
-      display: none;
-    }
   }
 }
 
@@ -18,9 +14,9 @@
 
 .tab-list {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-s);
   margin: 0;
-  padding: 0 0 24px;
+  padding: 0 0 var(--spacing-l);
   list-style: none;
   overflow-x: auto;
   scrollbar-width: none;
@@ -30,12 +26,12 @@
   }
 
   button {
-    padding: 8px 20px;
+    padding: var(--spacing-s) 20px;
     border-radius: 200px;
-    border: 1px solid var(--color-border, #d2d2d2);
+    border: 1px solid var(--color-border);
     background-color: transparent;
-    color: var(--color-text-dark, #0e1726);
-    font-size: var(--body-font-size-s, 15px);
+    color: var(--color-text-dark);
+    font-size: var(--body-font-size-s);
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
@@ -44,13 +40,13 @@
     margin: 0;
 
     &:hover {
-      background-color: #f0f0f0;
+      background-color: var(--color-surface-hover);
     }
 
     &.is-active {
-      background-color: #005597;
-      border-color: #005597;
-      color: #fff;
+      background-color: var(--color-interactive);
+      border-color: var(--color-interactive);
+      color: var(--color-surface);
     }
   }
 }

@@ -1,4 +1,3 @@
-/* Microsoft 365 FAQ-style accordion */
 .advanced-accordion {
   counter-reset: faq-counter;
 }
@@ -16,7 +15,7 @@
 
 .advanced-accordion details summary {
   position: relative;
-  padding: 24px 60px 24px 80px;
+  padding: var(--spacing-l) 60px var(--spacing-l) 80px;
   cursor: pointer;
   list-style: none;
   font-size: var(--body-font-size-l);
@@ -39,7 +38,7 @@
   content: "0" counter(faq-counter) "/";
   position: absolute;
   left: 0;
-  top: 24px;
+  top: var(--spacing-l);
   font-size: var(--body-font-size-m);
   font-weight: 600;
   color: var(--color-accent);
@@ -71,14 +70,14 @@
 }
 
 .advanced-accordion .accordion-item-body {
-  padding: 0 60px 24px 80px;
+  padding: 0 60px var(--spacing-l) 80px;
   font-size: var(--body-font-size-m);
   line-height: 1.6;
   color: var(--color-text);
 }
 
 .advanced-accordion .accordion-item-body p {
-  margin: 0 0 8px;
+  margin: 0 0 var(--spacing-s);
 }
 
 @media (width >= 900px) {
@@ -98,31 +97,28 @@
   }
 }
 
-/* -----------------------------------------------
-   COMPACT VARIANT — clean expandable list, no numbers
-   Used on product configurator pages.
-   ----------------------------------------------- */
+/* Compact variant — clean expandable list, no numbers */
 .advanced-accordion.compact {
   counter-reset: none;
 }
 
 .advanced-accordion.compact details {
-  border-top: 1px solid var(--color-border, #e3e3e3);
+  border-top: 1px solid var(--color-border);
   counter-increment: none;
 }
 
 .advanced-accordion.compact details:last-child {
-  border-bottom: 1px solid var(--color-border, #e3e3e3);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .advanced-accordion.compact details summary {
-  padding: 16px 0 16px 40px;
-  font-size: var(--body-font-size-m, 16px);
+  padding: var(--spacing-m) 0 var(--spacing-m) 40px;
+  font-size: var(--body-font-size-m);
   font-weight: 600;
-  color: var(--color-text-dark, #0e1726);
+  color: var(--color-text-dark);
 }
 
-/* No numbered counter — use ::before for chevron in front */
+/* Chevron icon in front */
 .advanced-accordion.compact details summary::before {
   content: '';
   position: absolute;
@@ -147,26 +143,25 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23616161' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
-/* Hide the ::after icon */
 .advanced-accordion.compact details summary::after {
   display: none;
 }
 
 .advanced-accordion.compact .accordion-item-body {
-  padding: 0 0 16px 40px;
-  font-size: var(--body-font-size-s, 15px);
+  padding: 0 0 var(--spacing-m) 40px;
+  font-size: var(--body-font-size-s);
   line-height: 1.6;
-  color: var(--color-text-muted, #616161);
+  color: var(--color-text-muted);
 }
 
 .advanced-accordion.compact .accordion-item-body p {
-  margin: 0 0 8px;
+  margin: 0 0 var(--spacing-s);
 }
 
 @media (width >= 900px) {
   .advanced-accordion.compact details summary {
     padding: 18px 0 18px 40px;
-    font-size: var(--body-font-size-l, 18px);
+    font-size: var(--body-font-size-l);
   }
 
   .advanced-accordion.compact .accordion-item-body {
