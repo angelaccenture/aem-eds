@@ -1,0 +1,93 @@
+[
+  {
+    "id": "main",
+    "components": [
+      "section"
+    ]
+  },
+  {
+    "id": "section",
+    "components": [
+      "text",
+      "image",
+      "advanced-accordion",
+      "button",
+      "advanced-carousel",
+      "card",
+      "cards-blog",
+      "form",
+      "fragment",
+      "hero",
+      "modal",
+      "table",
+      "advanced-tabs",
+      "teaser"
+    ]
+  },
+  {
+    "id": "article-section",
+    "components": [
+      "text",
+      "teaser"
+    ]
+  },
+  {
+    "id": "homepage-section",
+    "components": [
+      "advanced-tabs",
+      "advanced-carousel"
+    ]
+  },
+  {
+    "id": "blogpage-section",
+    "components": [
+      "text",
+      "button",
+      "cards-blog"
+    ]
+  },
+  {
+    "id": "tabs-section",
+    "components": [
+      "text",
+      "card",
+      "button"
+    ]
+  },
+  {
+    "id": "advanced-accordion",
+    "components": []
+  },
+  {
+    "id": "advanced-carousel",
+    "components": []
+  },
+  {
+    "id": "advanced-tabs",
+    "components": []
+  },
+  {
+    "id": "table",
+    "components": [
+      "table-row"
+    ]
+  },
+  {
+    "id": "table-2-columns",
+    "components": [
+      "table-col-2"
+    ]
+  },
+  {
+    "id": "table-3-columns",
+    "components": [
+      "table-col-3"
+    ]
+  },
+  {
+    "id": "table-4-columns",
+    "components": [
+      "table-col-4"
+    ]
+  }
+]

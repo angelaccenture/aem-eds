@@ -1,0 +1,439 @@
+{
+  "groups": [
+    {
+      "title": "Default Content",
+      "id": "default",
+      "components": [
+        {
+          "title": "Text",
+          "id": "text",
+          "plugins": {
+            "da": {
+              "name": "text",
+              "unsafeHTML": "<p>Normal Text goes here</p>"
+            },
+            "rte": {
+              "plugins": {
+                "format": [
+                  "bold",
+                  "italic"
+                ],
+                "list": [
+                  "unordered",
+                  "ordered"
+                ],
+                "justify": [
+                  "justifyleft",
+                  "justifycenter",
+                  "justifyright"
+                ],
+                "links": [
+                  "unlink",
+                  "link"
+                ]
+              },
+              "toolbar": [
+                "bold",
+                "italic",
+                "separator",
+                "unordered",
+                "ordered",
+                "separator",
+                "link"
+              ]
+            }
+          }
+        },
+        {
+          "title": "Rich Text",
+          "id": "richtext",
+          "plugins": {
+            "da": {
+              "name": "richtext",
+              "unsafeHTML": "<p>Rich Text goes here</p>"
+            }
+          }
+        },
+        {
+          "title": "Rich Text",
+          "id": "richtext",
+          "rte": {
+            "toolbar": {
+              "format": [
+                "bold",
+                "italic",
+                "underline",
+                "strike"
+              ],
+              "alignment": [
+                "left",
+                "center",
+                "right",
+                "justify"
+              ],
+              "direction": [
+                "rtl",
+                "ltr"
+              ],
+              "indentation": [
+                "indent",
+                "outdent"
+              ],
+              "blocks": [
+                "paragraph",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "code_block"
+              ],
+              "list": [
+                "bullet_list",
+                "ordered_list"
+              ],
+              "insert": [
+                "link",
+                "unlink",
+                "image"
+              ],
+              "sr_script": [
+                "superscript",
+                "subscript"
+              ],
+              "editor": [
+                "removeformat"
+              ],
+              "sections": [
+                "format",
+                "alignment",
+                "list"
+              ]
+            },
+            "actions": {
+              "bold": {
+                "label": "Bold",
+                "shortcut": "Mod-B",
+                "hideInline": true
+              }
+            }
+          },
+          "components": [
+            "richtext"
+          ]
+        },
+        {
+          "title": "Image",
+          "id": "image",
+          "model": "image",
+          "plugins": {
+            "da": {
+              "name": "image",
+              "type": "image",
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "img[alt]"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Sections",
+      "id": "sections",
+      "components": [
+        {
+          "title": "Section",
+          "id": "section",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div></div>"
+            }
+          },
+          "filter": "section",
+          "model": "section"
+        },
+        {
+          "title": "Article Section",
+          "id": "article-section",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div></div>"
+            }
+          },
+          "filter": "article-section",
+          "model": "section"
+        },
+        {
+          "title": "HomePage Section",
+          "id": "homepage-section",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div></div>"
+            }
+          },
+          "filter": "homepage-section",
+          "model": "section"
+        },
+        {
+          "title": "Advanced Tabs Section",
+          "id": "tabs-section",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div></div>"
+            }
+          },
+          "filter": "tabs-section",
+          "model": "section"
+        }
+      ]
+    },
+    {
+      "title": "Blocks",
+      "id": "blocks",
+      "components": [
+        {
+          "title": "Button",
+          "id": "button",
+          "model": "button",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"button primary\"><div><div><a href=\"http://www.linkgoeshere.com\" title=\"Aria Label\">Button Text</a></div></div></div>",
+              "fields": [
+                {
+                  "name": "text",
+                  "selector": "div>p>a"
+                },
+                {
+                  "name": "link",
+                  "selector": "div>p>a[href]"
+                },
+                {
+                  "name": "label",
+                  "selector": "div>p>a[title]"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Card",
+          "id": "card",
+          "model": "card",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"card\"><div><div><picture><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\"><source type=\"image/jpeg\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" width=\"3840\" height=\"2160\"></picture></div></div><div><div><p><strong>Unmatched speed</strong></p><p>AEM is the fastest way to publish, create, and serve websites.</p></div></div></div>",
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "div>div>picture>img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "div>div>picture>img[alt]"
+                },
+                {
+                  "name": "title",
+                  "selector": "div:nth-child(2)>div>p>strong"
+                },
+                {
+                  "name": "text",
+                  "selector": "div:nth-child(2)>div>p:nth-child(2)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Cards Blog",
+          "id": "cards-blog",
+          "model": "cards-blog",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"cards-blog\"><div><div><picture><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\"><source type=\"image/jpeg\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" width=\"960\" height=\"540\"></picture></div></div><div><div><p>Mar 17, 2026 | <a href=\"/blog/author/example\">Author Name</a></p><h3>Article Title</h3></div></div></div>",
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "div>div>picture>img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "div>div>picture>img[alt]"
+                },
+                {
+                  "name": "meta",
+                  "selector": "div:nth-child(2)>div>p"
+                },
+                {
+                  "name": "title",
+                  "selector": "div:nth-child(2)>div>h3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Fragment",
+          "id": "fragment",
+          "model": "fragment",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"fragment\"><div><div><p><a href=\"\">Fragment URL</a></p></div></div></div>",
+              "fields": [
+                {
+                  "name": "url",
+                  "selector": "div>div>p>a[href]"
+                },
+                {
+                  "name": "urlText",
+                  "selector": "div>div>p>a"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Hero",
+          "id": "hero",
+          "model": "hero",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"hero\"><div><div><picture><source type=\"image/webp\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\"><source type=\"image/jpeg\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" width=\"3840\" height=\"2160\"></picture></div></div><div><div><h1>Author Kit</h1><p>Powerfully simple experiences.</p></div></div></div>",
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "div:nth-child(1)>picture>img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "div:nth-child(1)>picture>img[alt]"
+                },
+                {
+                  "name": "title",
+                  "selector": "div:nth-child(2)>div>h1"
+                },
+                {
+                  "name": "text",
+                  "selector": "div:nth-child(2)>div>p"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Teaser",
+          "id": "teaser",
+          "model": "teaser",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"teaser\"><div><div><picture><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\"><source type=\"image/jpeg\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" width=\"3840\" height=\"2160\"></picture></div></div><div><div><p><strong>Unmatched speed</strong></p><p>AEM is the fastest way to publish, create, and serve websites.</p></div></div></div>",
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "div>div>picture>img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "div>div>picture>img[alt]"
+                },
+                {
+                  "name": "title",
+                  "selector": "div:nth-child(2)>div>p>strong"
+                },
+                {
+                  "name": "text",
+                  "selector": "div:nth-child(2)>div>p:nth-child(2)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Advanced Blocks",
+      "id": "advanced-blocks",
+      "components": [
+        {
+          "title": "Accordion",
+          "id": "advanced-accordion",
+          "model": "advanced-accordion",
+          "filter": "advanced-accordion",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"advanced-accordion\"><div><ul><li>Accordion Item 1</li></ul></div></div>",
+              "fields": [
+                {
+                  "name": "tablistall",
+                  "selector": "div>div>ul>li"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Carousel",
+          "id": "advanced-carousel",
+          "model": "advanced-carousel",
+          "filter": "advanced-carousel",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"advanced-carousel\"><div><ul><li>carousel Item 1</li></ul></div></div>",
+              "fields": [
+                {
+                  "name": "tablistall",
+                  "selector": "div>div>ul>li"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Tabs",
+          "id": "advanced-tabs",
+          "model": "advanced-tabs",
+          "filter": "advanced-tabs",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"advanced-tabs\"><div><ul><li>Tab 1</li></ul></div></div>",
+              "fields": [
+                {
+                  "name": "tablistone",
+                  "selector": "div>div>ul>li:nth-child(1)"
+                },
+                {
+                  "name": "tablisttwo",
+                  "selector": "div>div>ul>li:nth-child(2)"
+                },
+                {
+                  "name": "tablistthree",
+                  "selector": "div>div>ul>li:nth-child(3)"
+                },
+                {
+                  "name": "tablistfour",
+                  "selector": "div>div>ul>li:nth-child(4)"
+                },
+                {
+                  "name": "tablistfive",
+                  "selector": "div>div>ul>li:nth-child(5)"
+                },
+                {
+                  "name": "tablistsix",
+                  "selector": "div>div>ul>li:nth-child(6)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

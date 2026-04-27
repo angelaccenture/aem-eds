@@ -1,0 +1,862 @@
+[
+  {
+    "id": "page-metadata",
+    "fields": [
+      {
+        "component": "select",
+        "name": "Template",
+        "label": "Template",
+        "options": [
+          {
+            "name": "No Template",
+            "value": ""
+          },
+          {
+            "name": "Blank Page",
+            "value": "blankpage"
+          },
+          {
+            "name": "Homepage",
+            "value": "homepage"
+          },
+          {
+            "name": "News Article",
+            "value": "article"
+          },
+          {
+            "name": "Blog Page",
+            "value": "blogpage"
+          },
+          {
+            "name": "Developer",
+            "value": "developer"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "name": "Title",
+        "label": "Title",
+        "required": true,
+        "validation": {
+          "customErrorMsg": "Page Title is required"
+        }
+      },
+      {
+        "component": "text",
+        "name": "Description",
+        "label": "Description"
+      },
+      {
+        "component": "text",
+        "name": "Robots",
+        "label": "Robots",
+        "description": "Index control via robots"
+      },
+      {
+        "component": "text",
+        "name": "Tags",
+        "label": "Page Tags"
+      }
+    ]
+  },
+  {
+    "id": "image",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "imageAlt",
+        "label": "Alt Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "section",
+    "fields": [
+      {
+        "component": "tab",
+        "label": "Main",
+        "name": "tab1"
+      },
+      {
+        "component": "multiselect",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Highlight",
+            "value": "highlight"
+          },
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Container",
+            "value": "container"
+          }
+        ]
+      },
+      {
+        "component": "multiselect",
+        "name": "background",
+        "label": "Background Color",
+        "options": [
+          {
+            "name": "Red",
+            "value": "red"
+          },
+          {
+            "name": "Black",
+            "value": "black"
+          },
+          {
+            "name": "Blue",
+            "value": "blue"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "tab",
+        "label": "Layout",
+        "name": "tab2"
+      },
+      {
+        "component": "boolean",
+        "label": "Show Layout Mode",
+        "name": "layoutmode",
+        "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "grid",
+        "label": "Desktop Grid Columns",
+        "options": [
+          {
+            "name": "No Grid",
+            "value": ""
+          },
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "2",
+            "value": "2"
+          },
+          {
+            "name": "3",
+            "value": "3"
+          },
+          {
+            "name": "4",
+            "value": "4"
+          },
+          {
+            "name": "5",
+            "value": "5"
+          },
+          {
+            "name": "6",
+            "value": "6"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "gridtab",
+        "label": "Tablet Grid Columns",
+        "options": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "2",
+            "value": "2"
+          },
+          {
+            "name": "3",
+            "value": "3"
+          },
+          {
+            "name": "4",
+            "value": "4"
+          },
+          {
+            "name": "5",
+            "value": "5"
+          },
+          {
+            "name": "6",
+            "value": "6"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "label": "Hide in Mobile",
+        "name": "hidemobile",
+        "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "gridmob",
+        "label": "Mobile Grid Columns",
+        "condition": {
+          "===": [
+            {
+              "var": "hidemobile"
+            },
+            false
+          ]
+        },
+        "options": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "2",
+            "value": "2"
+          },
+          {
+            "name": "3",
+            "value": "3"
+          },
+          {
+            "name": "4",
+            "value": "4"
+          },
+          {
+            "name": "5",
+            "value": "5"
+          },
+          {
+            "name": "6",
+            "value": "6"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "gap",
+        "label": "Gap",
+        "options": [
+          {
+            "name": "X-Small",
+            "value": "xs"
+          },
+          {
+            "name": "Small",
+            "value": "s"
+          },
+          {
+            "name": "Medium",
+            "value": "m"
+          },
+          {
+            "name": "Large",
+            "value": "l"
+          },
+          {
+            "name": "X-Large",
+            "value": "xl"
+          },
+          {
+            "name": "XX-Large",
+            "value": "xxl"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "spacing",
+        "label": "Spacing",
+        "options": [
+          {
+            "name": "X-Small",
+            "value": "xs"
+          },
+          {
+            "name": "Small",
+            "value": "s"
+          },
+          {
+            "name": "Medium",
+            "value": "m"
+          },
+          {
+            "name": "Large",
+            "value": "l"
+          },
+          {
+            "name": "X-Large",
+            "value": "xl"
+          },
+          {
+            "name": "XX-Large",
+            "value": "xxl"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "advanced-accordion",
+    "fields": [
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Standard",
+            "value": "standard"
+          },
+          {
+            "name": "Blue Standard",
+            "value": "bluestandard"
+          }
+        ]
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "tablistall",
+        "label": "Fix These Later"
+      }
+    ]
+  },
+  {
+    "id": "advanced-carousel",
+    "fields": [
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Standard",
+            "value": "standard"
+          },
+          {
+            "name": "Blue Standard",
+            "value": "bluestandard"
+          }
+        ]
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "tablistall",
+        "label": "Fix These Later"
+      }
+    ]
+  },
+  {
+    "id": "advanced-tabs",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Standard",
+            "value": "standard"
+          },
+          {
+            "name": "Blue Standard",
+            "value": "bluestandard"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablistone",
+        "label": "First Tab Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablisttwo",
+        "label": "Second Tab Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablistthree",
+        "label": "Third Tab Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablistfour",
+        "label": "Fourth Tab Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablistfive",
+        "label": "Fifth Tab Name"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "tablistsix",
+        "label": "Sixth Tab Name"
+      }
+    ]
+  },
+  {
+    "id": "button",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Primary",
+            "value": "primary"
+          },
+          {
+            "name": "Secondary",
+            "value": "secondary"
+          },
+          {
+            "name": "Text Button",
+            "value": "text-btn"
+          },
+          {
+            "name": "Input",
+            "value": "primary-variant"
+          },
+          {
+            "name": "Input Secondary",
+            "value": "secondary-variant"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "text",
+        "label": "Display Text"
+      },
+      {
+        "component": "text",
+        "name": "link",
+        "label": "URL",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "label",
+        "label": "Title",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "card",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Quiet",
+            "value": "quiet"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Image is required"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Alt Text is required"
+        }
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "cards-blog",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt",
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "name": "meta",
+        "value": "",
+        "label": "Date & Author",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "fragment",
+    "fields": [
+      {
+        "component": "text",
+        "name": "urlText",
+        "label": "Fragment URL Text"
+      },
+      {
+        "component": "text",
+        "name": "url",
+        "label": "Fragment URL",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "hero",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Small",
+            "value": "small"
+          },
+          {
+            "name": "Large",
+            "value": "large"
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Center",
+            "value": "center"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Image is required"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": "",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Alt Text is required"
+        }
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "modal",
+    "fields": [
+      {
+        "component": "text",
+        "name": "urlText",
+        "label": "modal URL Text"
+      },
+      {
+        "component": "text",
+        "name": "url",
+        "label": "modal URL",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "table",
+    "fields": [
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "value": "",
+        "label": "Options",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Border",
+            "children": [
+              {
+                "name": "Striped",
+                "value": "striped"
+              },
+              {
+                "name": "Bordered",
+                "value": "bordered"
+              }
+            ]
+          },
+          {
+            "name": "Header",
+            "children": [
+              {
+                "name": "No Header",
+                "value": "no-header"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "filter",
+        "label": "Columns",
+        "valueType": "string",
+        "value": "table",
+        "options": [
+          {
+            "name": "1 Column",
+            "value": "table"
+          },
+          {
+            "name": "2 Columns",
+            "value": "table-2-columns"
+          },
+          {
+            "name": "3 Columns",
+            "value": "table-3-columns"
+          },
+          {
+            "name": "4 Columns",
+            "value": "table-4-columns"
+          },
+          {
+            "name": "5 Columns",
+            "value": "table-5-columns"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table-row",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column1text",
+        "label": "Column1"
+      }
+    ]
+  },
+  {
+    "id": "table-col-2",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column1text",
+        "label": "Column1"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column2text",
+        "label": "Column2"
+      }
+    ]
+  },
+  {
+    "id": "table-col-3",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column1text",
+        "label": "Column1"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column2text",
+        "label": "Column2"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column3text",
+        "label": "Column3"
+      }
+    ]
+  },
+  {
+    "id": "table-col-4",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column1text",
+        "label": "Column1"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column2text",
+        "label": "Column2"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column3text",
+        "label": "Column3"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "column4text",
+        "label": "Column4"
+      }
+    ]
+  },
+  {
+    "id": "teaser",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "value": "left",
+        "options": [
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Image is required"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Image Alt",
+        "required": true,
+        "multi": false,
+        "validation": {
+          "customErrorMsg": "Alt Text is required"
+        }
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  }
+]

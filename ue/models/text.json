@@ -1,0 +1,64 @@
+{
+  "definitions": [
+    {
+      "title": "Text",
+      "id": "text",
+      "plugins": {
+        "da": {
+          "name": "text",
+           "unsafeHTML": "<p>Normal Text goes here</p>"
+         
+        },
+         "rte": {
+            "plugins": {
+              "format": ["bold", "italic"],
+              "list": ["unordered", "ordered"],
+              "justify": ["justifyleft", "justifycenter", "justifyright"],
+              "links": ["unlink", "link"]
+            },
+            "toolbar": ["bold", "italic", "separator", "unordered", "ordered", "separator", "link"]
+          }
+      }
+    },
+    {
+      "title": "Rich Text",
+      "id": "richtext",
+      "plugins": {
+        "da": {
+          "name": "richtext",
+           "unsafeHTML": "<p>Rich Text goes here</p>"
+         
+        }
+      }
+    },
+    {
+    "title": "Rich Text",
+    "id": "richtext",
+    "rte": {
+    "toolbar": {
+     "format": ["bold", "italic", "underline", "strike"],
+    "alignment": ["left", "center", "right", "justify"],
+    "direction": ["rtl", "ltr"],
+    "indentation": ["indent", "outdent"],
+    "blocks": ["paragraph", "h1", "h2", "h3", "h4", "h5", "h6", "code_block"],
+    "list": ["bullet_list", "ordered_list"],
+    "insert": ["link", "unlink", "image"],
+    "sr_script": ["superscript", "subscript"],
+    "editor": ["removeformat"],
+    "sections": ["format", "alignment", "list"]
+      },
+      "actions": {
+        "bold": {
+      "label": "Bold",
+      "shortcut": "Mod-B",
+      "hideInline": true
+    }
+      }
+    },
+    "components": [
+      "richtext"
+    ]
+  }
+  ],
+  "models": []
+}

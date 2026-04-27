@@ -1,0 +1,331 @@
+{
+  "definitions": [
+    {
+      "title": "Section",
+      "id": "section",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>"
+        }
+      },
+      "filter": "section",
+      "model": "section"
+    },
+    {
+      "title": "Article Section",
+      "id": "article-section",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>"
+        }
+      },
+      "filter": "article-section",
+      "model": "section"
+    },
+    {
+      "title": "HomePage Section",
+      "id": "homepage-section",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>"
+        }
+      },
+      "filter": "homepage-section",
+      "model": "section"
+    },
+     {
+      "title": "Advanced Tabs Section",
+      "id": "tabs-section",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>"
+        }
+      },
+      "filter": "tabs-section",
+      "model": "section"
+    }
+  ],
+  "models": [
+    {
+      "id": "section",
+      "fields": [
+{
+      "component": "tab",
+      "label": "Main",
+      "name": "tab1"
+    },
+    {
+          "component": "multiselect",
+          "name": "style",
+          "label": "Style",
+          "options": [
+            {
+              "name": "Highlight",
+              "value": "highlight"
+            },
+              {
+              "name": "Center",
+              "value": "center"
+            },
+              {
+              "name": "Container",
+              "value": "container"
+            }         
+            
+          ]
+        },
+         {
+          "component": "multiselect",
+          "name": "background",
+          "label": "Background Color",
+          "options": [
+            {
+              "name": "Red",
+              "value": "red"
+            },
+              {
+              "name": "Black",
+              "value": "black"
+            },
+              {
+              "name": "Blue",
+              "value": "blue"
+            }         
+            
+          ]
+        },
+      {
+        "component": "reference",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+      
+      },
+    {
+      "component": "tab",
+      "label": "Layout",
+      "name": "tab2"
+    }, 
+      {
+        "component": "boolean",
+        "label": "Show Layout Mode",
+        "name": "layoutmode",
+        "valueType": "boolean"
+      },
+      {
+         "component": "select",
+          "name": "grid",
+          "label": "Desktop Grid Columns",
+          "options": [
+             {
+              "name": "No Grid",
+              "value": ""
+            },
+            {
+              "name": "1",
+              "value": "1"
+            },
+              {
+              "name": "2",
+              "value": "2"
+            },
+              {
+              "name": "3",
+              "value": "3"
+            },
+             {
+              "name": "4",
+              "value": "4"
+            },
+             {
+              "name": "5",
+              "value": "5"
+            },
+            {
+              "name": "6",
+              "value": "6"
+            }          
+          ]  
+        },
+         {
+          "component": "select",
+          "name": "gridtab",
+          "label": "Tablet Grid Columns",
+          "options": [
+            {
+              "name": "1",
+              "value": "1"
+            },
+              {
+              "name": "2",
+              "value": "2"
+            },
+              {
+              "name": "3",
+              "value": "3"
+            },
+             {
+              "name": "4",
+              "value": "4"
+            },
+             {
+              "name": "5",
+              "value": "5"
+            },
+            {
+              "name": "6",
+              "value": "6"
+            }          
+          ]  
+        },
+        {
+        "component": "boolean",
+        "label": "Hide in Mobile",
+        "name": "hidemobile",
+        "valueType": "boolean"
+        },
+         {
+          "component": "select",
+          "name": "gridmob",
+          "label": "Mobile Grid Columns",
+           "condition": { "===": [{"var" : "hidemobile"}, false] },
+          "options": [
+            {
+              "name": "1",
+              "value": "1"
+            },
+              {
+              "name": "2",
+              "value": "2"
+            },
+              {
+              "name": "3",
+              "value": "3"
+            },
+             {
+              "name": "4",
+              "value": "4"
+            },
+             {
+              "name": "5",
+              "value": "5"
+            },
+            {
+              "name": "6",
+              "value": "6"
+            }          
+          ]  
+        },
+         {
+          "component": "select",
+          "name": "gap",
+          "label": "Gap",
+          "options": [
+             {
+              "name": "X-Small",
+              "value": "xs"
+            },
+             {
+              "name": "Small",
+              "value": "s"
+            },
+            {
+              "name": "Medium",
+              "value": "m"
+            },
+            {
+              "name": "Large",
+              "value": "l"
+            },
+            {
+              "name": "X-Large",
+              "value": "xl"
+            },
+            {
+              "name": "XX-Large",
+              "value": "xxl"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "name": "spacing",
+          "label": "Spacing",
+          "options": [
+              {
+              "name": "X-Small",
+              "value": "xs"
+            },
+             {
+              "name": "Small",
+              "value": "s"
+            },
+            {
+              "name": "Medium",
+              "value": "m"
+            },
+            {
+              "name": "Large",
+              "value": "l"
+            },
+            {
+              "name": "X-Large",
+              "value": "xl"
+            },
+            {
+              "name": "XX-Large",
+              "value": "xxl"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "section",
+      "components": [
+        "text",
+        "image",
+        "advanced-accordion",
+        "button",
+        "advanced-carousel",
+        "card",
+        "cards-blog",
+        "form",
+        "fragment",
+        "hero",
+        "modal",
+        "table",
+        "advanced-tabs",
+        "teaser"
+      ]
+    },
+    {
+      "id": "article-section",
+      "components": [
+        "text",
+        "teaser"
+      ]
+    },
+     {
+      "id": "homepage-section",
+      "components": [
+        "advanced-tabs",
+        "advanced-carousel"
+      ]
+    },
+    {
+      "id": "blogpage-section",
+      "components": [
+        "text","button","cards-blog"
+      ]
+    },
+    {
+      "id": "tabs-section",
+      "components": [
+        "text","card","button"
+      ]
+    }
+  ]
+}

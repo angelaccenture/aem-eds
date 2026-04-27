@@ -1,0 +1,104 @@
+{
+  "definitions": [
+    {
+      "title": "Hero",
+      "id": "hero",
+      "model": "hero",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"hero\"><div><div><picture><source type=\"image/webp\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\"><source type=\"image/jpeg\" srcset=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://content.da.live/aemsites/author-kit/media/bg-image.jpg\" width=\"3840\" height=\"2160\"></picture></div></div><div><div><h1>Author Kit</h1><p>Powerfully simple experiences.</p></div></div></div>",
+          "fields": [
+            {
+              "name": "image",
+              "selector": "div:nth-child(1)>picture>img[src]"
+            },
+            {
+              "name": "imageAlt",
+              "selector": "div:nth-child(1)>picture>img[alt]"
+            },
+            {
+              "name": "title",
+              "selector": "div:nth-child(2)>div>h1"
+            },
+            {
+              "name": "text",
+              "selector": "div:nth-child(2)>div>p"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "hero",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "options": [
+           {
+              "name": "Small",
+              "value": "small"
+            },
+            {
+              "name": "Large",
+              "value": "large"
+            },
+              {
+              "name": "Light",
+              "value": "light"
+            },
+             {
+              "name": "Dark",
+              "value": "dark"
+            },
+             {
+              "name": "Center",
+              "value": "center"
+            }            
+          ]
+        },
+       {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "required": true,
+          "multi": false,
+           "validation": {
+              "customErrorMsg": "Image is required"
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Alt",
+          "value": "",
+          "required": true,
+          "multi": false,
+           "validation": {
+              "customErrorMsg": "Alt Text is required"
+          }
+        },
+        {
+          "component": "text",
+          "name": "title",
+          "value": "",
+          "label": "Title",
+          "valueType": "string"
+        },
+        {
+          "component": "richtext",
+          "name": "text",
+          "value": "",
+          "label": "Text",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

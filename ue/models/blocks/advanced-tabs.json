@@ -1,0 +1,103 @@
+{
+  "definitions": [
+    {
+      "title": "Tabs",
+      "id": "advanced-tabs",
+      "model": "advanced-tabs",
+      "filter": "advanced-tabs",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"advanced-tabs\"><div><ul><li>Tab 1</li></ul></div></div>",
+          "fields": [
+            {
+              "name": "tablistone",
+              "selector": "div>div>ul>li:nth-child(1)"
+            },
+            {
+              "name": "tablisttwo",
+              "selector": "div>div>ul>li:nth-child(2)"
+            },
+             {
+              "name": "tablistthree",
+              "selector": "div>div>ul>li:nth-child(3)"
+            },
+             {
+              "name": "tablistfour",
+              "selector": "div>div>ul>li:nth-child(4)"
+            },
+            {
+              "name": "tablistfive",
+              "selector": "div>div>ul>li:nth-child(5)"
+            },
+            {
+              "name": "tablistsix",
+              "selector": "div>div>ul>li:nth-child(6)"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "advanced-tabs",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "options": [
+           {
+              "name": "Standard",
+              "value": "standard"
+            },
+            {
+              "name": "Blue Standard",
+              "value": "bluestandard"
+            }            
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablistone",
+          "label": "First Tab Name"
+        },
+         {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablisttwo",
+          "label": "Second Tab Name"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablistthree",
+          "label": "Third Tab Name"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablistfour",
+          "label": "Fourth Tab Name"
+        },
+         {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablistfive",
+          "label": "Fifth Tab Name"
+        },
+         {
+          "component": "text",
+          "valueType": "string",
+          "name": "tablistsix",
+          "label": "Sixth Tab Name"
+        }
+      ]
+    }
+  ],
+  "filters": [ {
+      "id": "advanced-tabs",
+      "components": []
+    }]
+}

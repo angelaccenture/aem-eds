@@ -1,0 +1,64 @@
+{
+  "groups": [
+    {
+      "title": "Default Content",
+      "id": "default",
+      "components": [
+        {
+          "...": "./text.json#/definitions"
+        },
+        {
+          "...": "./image.json#/definitions"
+        }
+      ]
+    },
+    {
+      "title": "Sections",
+      "id": "sections",
+      "components": [
+        {
+          "...": "./section.json#/definitions"
+        }
+      ]
+    },
+      {
+      "title": "Blocks",
+      "id": "blocks",
+      "components": [
+        {
+          "...": "./blocks/button.json#/definitions"
+        },
+        {
+          "...": "./blocks/card.json#/definitions"
+        },
+        {
+          "...": "./blocks/cards-blog.json#/definitions"
+        },
+        {
+          "...": "./blocks/fragment.json#/definitions"
+        },
+        {
+          "...": "./blocks/hero.json#/definitions"
+        },
+        {
+          "...": "./blocks/teaser.json#/definitions"
+        }
+      ]
+    },
+    {
+      "title": "Advanced Blocks",
+      "id": "advanced-blocks",
+      "components": [
+        {
+          "...": "./blocks/advanced-accordion.json#/definitions"
+        },
+        {
+          "...": "./blocks/advanced-carousel.json#/definitions"
+        },
+        {
+          "...": "./blocks/advanced-tabs.json#/definitions"
+        }
+      ]
+    }
+  ]
+}
