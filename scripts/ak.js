@@ -77,16 +77,19 @@ export async function loadBlock(block) {
   return block;
 }
 
-function loadTemplate() {
+async function loadTemplate() {
   const meta = getMetadata('template');
   if (!meta) return;
   const template = meta.replaceAll(' ', '-').toLowerCase();
   const { codeBase } = getConfig();
   document.body.classList.add('has-template');
-  loadStyle(`${codeBase}/templates/${template}/${template}.css`).then(() => {
-    document.body.classList.add(`${template}-template`);
-    document.body.classList.remove('has-template');
-  });
+  await loadStyle(`${codeBase}/templates/${template}/${template}.css`);
+  document.body.classList.add(`${template}-template`);
+  document.body.classList.remove('has-template');
+  try {
+    const mod = await import(`${codeBase}/templates/${template}/${template}.js`);
+    if (mod.default) await mod.default();
+  } catch (e) { /* no JS for this template */ }
 }
 
 function decoratePictures(el) {
