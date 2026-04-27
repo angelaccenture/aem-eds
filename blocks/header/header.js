@@ -71,7 +71,7 @@ function decorateScheme(btn) {
     body.classList.remove(theme.remove);
     body.classList.add(theme.add);
     localStorage.setItem('color-scheme', theme.add);
-    // Re-calculatie section schemes
+    // Re-calculate section schemes
     const sections = document.querySelectorAll('.section');
     for (const section of sections) {
       setColorScheme(section);
@@ -104,7 +104,10 @@ async function decorateAction(header, pattern) {
   const iconClass = icon?.classList[1]?.replace('icon-', '') || 'default';
   wrapper.className = `action-wrapper ${iconClass}`;
   wrapper.append(btn);
-  link.parentElement.parentElement.replaceChild(wrapper, link.parentElement);
+  const linkParent = link.parentElement;
+  if (linkParent?.parentElement) {
+    linkParent.parentElement.replaceChild(wrapper, linkParent);
+  }
 
   if (pattern === '/tools/widgets/language') decorateLanguage(btn);
   if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
@@ -132,16 +135,20 @@ function decorateNavItem(li) {
   if (link) link.classList.add('main-nav-link');
   const menu = decorateMegaMenu(li) || decorateMenu(li);
   if (!(menu || link)) return;
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    toggleMenu(li);
-  });
+  if (link) {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleMenu(li);
+    });
+  }
 }
 
 function decorateBrandSection(section) {
   section.classList.add('brand-section');
   const brandLink = section.querySelector('a');
-  const [, text] = brandLink.childNodes;
+  if (!brandLink) return;
+  const text = brandLink.childNodes[1];
+  if (!text) return;
   const span = document.createElement('span');
   span.className = 'brand-text';
   span.append(text);
