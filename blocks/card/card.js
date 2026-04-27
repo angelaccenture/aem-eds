@@ -23,8 +23,10 @@ export default function init(el) {
   const cta = ctaPara.querySelector('a');
   if (!cta) return;
   const hashAware = el.classList.contains('hash-aware');
-  if (hashAware) {
-    cta.href = `${cta.getAttribute('href')}${window.location.hash}`;
+  if (hashAware && window.location.hash) {
+    const href = cta.getAttribute('href');
+    const base = href.split('#')[0];
+    cta.href = `${base}${window.location.hash}`;
   }
   ctaPara.classList.add('card-cta-container');
   inner.append(ctaPara);

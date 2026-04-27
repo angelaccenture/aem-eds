@@ -55,19 +55,6 @@ function getCarouselList(carousel, carouselPanels, instanceId) {
     carouselList.append(indicator);
   }
 
-  carouselList.addEventListener('keydown', (e) => {
-    const buttons = [...carouselList.querySelectorAll('.carousel-slide-indicator button')];
-    const current = buttons.findIndex((btn) => btn.classList.contains('is-active'));
-    let next;
-    if (e.key === 'ArrowRight') next = (current + 1) % buttons.length;
-    else if (e.key === 'ArrowLeft') next = (current - 1 + buttons.length) % buttons.length;
-    else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = buttons.length - 1;
-    else return;
-    e.preventDefault();
-    buttons[next]?.focus();
-  });
-
   return carouselList;
 }
 
@@ -123,18 +110,14 @@ export default function init(el) {
     sibling = sibling.nextElementSibling;
   }
 
-  const carouselList = getCarouselList(carousel, carouselPanels, instanceId);
   const { nav, prevBtn, nextBtn } = createNavButtons();
   const playPauseBtn = createPlayPauseButton();
 
   const AUTOPLAY_INTERVAL = 6000;
   let autoplayTimer = null;
+  let userPaused = false;
 
-  function advanceSlide() {
-    const activeIndex = getActiveIndex(carouselList);
-    const nextIndex = (activeIndex + 1) % carouselPanels.length;
-    goToSlide(nextIndex, carouselList, carouselPanels, prevBtn, nextBtn);
-  }
+  const indicators = getCarouselList(carousel, carouselPanels, instanceId);
 
   function stopAutoplay() {
     if (autoplayTimer) {
@@ -146,46 +129,80 @@ export default function init(el) {
   }
 
   function startAutoplay() {
+    if (userPaused) return;
     stopAutoplay();
-    autoplayTimer = setInterval(advanceSlide, AUTOPLAY_INTERVAL);
+    autoplayTimer = setInterval(() => {
+      const active = getActiveIndex(indicators);
+      const next = (active + 1) % carouselPanels.length;
+      goToSlide(next, indicators, carouselPanels, prevBtn, nextBtn);
+    }, AUTOPLAY_INTERVAL);
     playPauseBtn.classList.add('is-playing');
     playPauseBtn.setAttribute('aria-label', 'Pause autoplay');
   }
 
+  function manualChange(idx) {
+    userPaused = true;
+    stopAutoplay();
+    goToSlide(idx, indicators, carouselPanels, prevBtn, nextBtn);
+  }
+
+  indicators.addEventListener('keydown', (e) => {
+    const btns = [
+      ...indicators.querySelectorAll(
+        '.carousel-slide-indicator button',
+      ),
+    ];
+    const cur = btns.findIndex(
+      (b) => b.classList.contains('is-active'),
+    );
+    let next;
+    if (e.key === 'ArrowRight') {
+      next = (cur + 1) % btns.length;
+    } else if (e.key === 'ArrowLeft') {
+      next = (cur - 1 + btns.length) % btns.length;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = btns.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    manualChange(next);
+    btns[next]?.focus();
+  });
+
   playPauseBtn.addEventListener('click', () => {
     if (autoplayTimer) {
+      userPaused = true;
       stopAutoplay();
     } else {
+      userPaused = false;
       startAutoplay();
     }
   });
 
-  carouselList.querySelectorAll('.carousel-slide-indicator button').forEach((btn, idx) => {
-    btn.addEventListener('click', () => {
-      stopAutoplay();
-      goToSlide(idx, carouselList, carouselPanels, prevBtn, nextBtn);
-    });
+  indicators.querySelectorAll(
+    '.carousel-slide-indicator button',
+  ).forEach((btn, idx) => {
+    btn.addEventListener('click', () => manualChange(idx));
   });
 
   prevBtn.addEventListener('click', () => {
-    stopAutoplay();
-    const activeIndex = getActiveIndex(carouselList);
-    if (activeIndex > 0) {
-      goToSlide(activeIndex - 1, carouselList, carouselPanels, prevBtn, nextBtn);
-    }
+    const active = getActiveIndex(indicators);
+    if (active > 0) manualChange(active - 1);
   });
 
   nextBtn.addEventListener('click', () => {
-    stopAutoplay();
-    const activeIndex = getActiveIndex(carouselList);
-    if (activeIndex < carouselPanels.length - 1) {
-      goToSlide(activeIndex + 1, carouselList, carouselPanels, prevBtn, nextBtn);
+    const active = getActiveIndex(indicators);
+    if (active < carouselPanels.length - 1) {
+      manualChange(active + 1);
     }
   });
 
   carousel.remove();
   const nextBtn2 = nav.querySelector('.slide-next');
-  nav.insertBefore(carouselList, nextBtn2);
+  nav.insertBefore(indicators, nextBtn2);
   nav.insertBefore(playPauseBtn, nextBtn2);
   el.append(...carouselPanels, nav);
 
@@ -195,7 +212,11 @@ export default function init(el) {
     entries.forEach((entry) => {
       if (!entry.isIntersecting && autoplayTimer) {
         stopAutoplay();
-      } else if (entry.isIntersecting && !autoplayTimer) {
+      } else if (
+        entry.isIntersecting
+        && !autoplayTimer
+        && !userPaused
+      ) {
         startAutoplay();
       }
     });
@@ -205,7 +226,11 @@ export default function init(el) {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && autoplayTimer) {
       stopAutoplay();
-    } else if (!document.hidden && !autoplayTimer) {
+    } else if (
+      !document.hidden
+      && !autoplayTimer
+      && !userPaused
+    ) {
       startAutoplay();
     }
   });

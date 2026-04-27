@@ -1,6 +1,4 @@
 export default function init(el) {
-  const parent = el.closest('.fragment-content, main');
-
   const list = el.querySelector('.advanced-accordion ul');
   if (!list) {
     // eslint-disable-next-line no-console
@@ -9,15 +7,19 @@ export default function init(el) {
   }
 
   const items = [...list.querySelectorAll('li')];
-  // Collect subsequent sibling sections as accordion panels
-  const blockSection = el.closest('.section .advanced-accordion')?.closest('.section');
-  if (blockSection) blockSection.classList.add('accordion-owner');
 
-  const sibSections = [...parent.querySelectorAll('.accordion-owner ~ .section')];
-  const panels = sibSections.slice(0, items.length);
-  panels.forEach((s) => s.classList.add('accordion-panel'));
+  const currSection = el.closest('.section');
+  if (!currSection) return;
 
-  // Build accordion from details/summary
+  const panelCount = items.length;
+  const panels = [];
+  let sibling = currSection.nextElementSibling;
+  while (sibling && panels.length < panelCount) {
+    if (sibling.querySelector('.advanced-accordion, .advanced-carousel, .advanced-tabs')) break;
+    panels.push(sibling);
+    sibling = sibling.nextElementSibling;
+  }
+
   const accordion = document.createElement('div');
   accordion.className = 'accordion-items';
 
