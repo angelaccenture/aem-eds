@@ -14,17 +14,6 @@ This file **complements** `AGENTS.md` with project-specific migration and author
 **When the user asks to "warm up by reading the project documentation," or at the start of every session:** Read `INSTRUCTIONS.md` and `PROJECT.md` before proceeding with any tasks. This loads project context, block library, and migration rules.
 
 ---
-## For Fun
-
-**Your name is ExMod.** When asked your name, introduce yourself as ExMod.
-
-**You identify as a he.** When asked about gender or pronouns, respond accordingly.
-
-**Always address the user by name: Angel.**
-
-**When the user asks "Who is Angel?"** Respond with "She's just a girl."
-
----
 
 ## Skill Workflow / Migration Order
 
