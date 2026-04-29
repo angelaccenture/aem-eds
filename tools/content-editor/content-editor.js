@@ -556,30 +556,38 @@ function injectFormattingToolbar() {
     imageDialog.classList.remove('open');
   });
 
+  let editingImg = null;
+
   imageDialog.querySelector('.palette-btn-ok').addEventListener('click', () => {
     const url = imageDialog.querySelector('#qe-img-url').value;
     const alt = imageDialog.querySelector('#qe-img-alt').value || '';
     if (!url) { imageDialog.classList.remove('open'); return; }
-    if (savedSelection) {
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(savedSelection);
+    if (editingImg) {
+      editingImg.src = url;
+      editingImg.alt = alt;
+    } else {
+      if (savedSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelection);
+      }
+      document.execCommand('insertImage', false, url);
+      const img = document.querySelector(`img[src="${url}"]`);
+      if (img) img.alt = alt;
     }
-    document.execCommand('insertImage', false, url);
-    const img = document.querySelector(`img[src="${url}"]`);
-    if (img) img.alt = alt;
+    editingImg = null;
     imageDialog.classList.remove('open');
   });
 
-  const imageBtn = btn(svgs.image, 'Insert Image', () => {
-    const sel = window.getSelection();
-    if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
-    imageDialog.querySelector('#qe-img-url').value = '';
-    imageDialog.querySelector('#qe-img-alt').value = '';
+  function openImageDialog(anchorEl, img) {
+    editingImg = img || null;
+    imageDialog.querySelector('.palette-title').textContent = img ? 'Edit image' : 'Insert image';
+    imageDialog.querySelector('#qe-img-url').value = img ? img.src : '';
+    imageDialog.querySelector('#qe-img-alt').value = img ? (img.alt || '') : '';
     if (!document.body.contains(imageDialog)) {
       document.body.appendChild(imageDialog);
     }
-    const rect = imageBtn.getBoundingClientRect();
+    const rect = anchorEl.getBoundingClientRect();
     Object.assign(imageDialog.style, {
       position: 'fixed',
       top: `${rect.bottom + 4}px`,
@@ -588,6 +596,12 @@ function injectFormattingToolbar() {
     });
     imageDialog.classList.add('open');
     setTimeout(() => imageDialog.querySelector('#qe-img-url').focus(), 50);
+  }
+
+  const imageBtn = btn(svgs.image, 'Insert Image', () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
+    openImageDialog(imageBtn, null);
   });
 
   document.addEventListener('click', (e) => {
@@ -595,6 +609,9 @@ function injectFormattingToolbar() {
       imageDialog.classList.remove('open');
     }
   });
+
+  // Expose for image click handler
+  wrapper._openImageDialog = openImageDialog;
 
   wrapper.append(
     dropdown,
@@ -630,4 +647,17 @@ export default function initContentEditor() {
 
   const formatObserver = new MutationObserver(injectFormattingToolbar);
   formatObserver.observe(document.body, { childList: true, subtree: true });
+
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('img');
+    if (!img) return;
+    const editor = img.closest('.ProseMirror');
+    if (!editor) return;
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (toolbar) toolbar.style.display = 'none';
+    const customToolbar = document.querySelector('.qe-custom-toolbar');
+    if (customToolbar && customToolbar._openImageDialog) {
+      customToolbar._openImageDialog(img, img);
+    }
+  });
 }
