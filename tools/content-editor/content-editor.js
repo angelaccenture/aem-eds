@@ -472,12 +472,6 @@ function injectFormattingToolbar() {
     savedSelection = null;
   });
 
-  document.addEventListener('click', (e) => {
-    if (linkDialog.classList.contains('open') && !linkDialog.contains(e.target)) {
-      linkDialog.classList.remove('open');
-    }
-  });
-
   const linkBtn = btn(svgs.link, 'Add Link', () => {
     const sel = window.getSelection();
     if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
@@ -514,6 +508,12 @@ function injectFormattingToolbar() {
     setTimeout(() => linkDialog.querySelector('#qe-link-url').focus(), 50);
   });
   linkBtn.dataset.command = 'link';
+
+  document.addEventListener('click', (e) => {
+    if (linkDialog.classList.contains('open') && !linkDialog.contains(e.target) && !linkBtn.contains(e.target)) {
+      linkDialog.classList.remove('open');
+    }
+  });
 
   function updateActiveStates() {
     const cmds = ['bold', 'italic', 'underline', 'strikeThrough', 'superscript', 'subscript'];
