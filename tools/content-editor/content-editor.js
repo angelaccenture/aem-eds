@@ -60,7 +60,7 @@ function addStyles() {
       color: #333;
     }
     .qe-custom-toolbar .qe-btn.active {
-      color: #333;
+      color: #111;
     }
     .qe-custom-toolbar .qe-btn svg {
       width: 15px;
@@ -396,23 +396,55 @@ function injectFormattingToolbar() {
     redo: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>',
   };
 
+  const boldBtn = btn(svgs.bold, 'Bold', () => dispatchKey('b'));
+  boldBtn.dataset.command = 'bold';
+  const italicBtn = btn(svgs.italic, 'Italic', () => dispatchKey('i'));
+  italicBtn.dataset.command = 'italic';
+  const underlineBtn = btn(svgs.underline, 'Underline', () => dispatchKey('u'));
+  underlineBtn.dataset.command = 'underline';
+  const strikeBtn = btn(svgs.strikethrough, 'Strikethrough', () => dispatchKey('d', { shift: true }));
+  strikeBtn.dataset.command = 'strikeThrough';
+  const superBtn = btn(svgs.superscript, 'Superscript', () => dispatchKey('.', { shift: true }));
+  superBtn.dataset.command = 'superscript';
+  const subBtn = btn(svgs.subscript, 'Subscript', () => dispatchKey(',', { shift: true }));
+  subBtn.dataset.command = 'subscript';
+  const linkBtn = btn(svgs.link, 'Add Link', () => {
+    const url = prompt('Enter URL:');
+    if (url) document.execCommand('createLink', false, url);
+  });
+  linkBtn.dataset.command = 'link';
+
+  function updateActiveStates() {
+    const cmds = ['bold', 'italic', 'underline', 'strikeThrough', 'superscript', 'subscript'];
+    wrapper.querySelectorAll('.qe-btn[data-command]').forEach((b) => {
+      const cmd = b.dataset.command;
+      if (cmd === 'link') {
+        const sel = window.getSelection();
+        let node = sel?.anchorNode;
+        if (node && node.nodeType === 3) node = node.parentElement;
+        b.classList.toggle('active', !!node?.closest('a'));
+      } else if (cmds.includes(cmd)) {
+        b.classList.toggle('active', document.queryCommandState(cmd));
+      }
+    });
+  }
+
+  document.addEventListener('selectionchange', updateActiveStates);
+
   wrapper.append(
     dropdown,
     sep(),
-    btn(svgs.bold, 'Bold', () => dispatchKey('b')),
-    btn(svgs.italic, 'Italic', () => dispatchKey('i')),
-    btn(svgs.underline, 'Underline', () => dispatchKey('u')),
-    btn(svgs.strikethrough, 'Strikethrough', () => dispatchKey('d', { shift: true })),
-    btn(svgs.superscript, 'Superscript', () => dispatchKey('.', { shift: true })),
-    btn(svgs.subscript, 'Subscript', () => dispatchKey(',', { shift: true })),
+    boldBtn,
+    italicBtn,
+    underlineBtn,
+    strikeBtn,
+    superBtn,
+    subBtn,
     textBtn('T,', 'Clear formatting', () => dispatchKey('\\', {}), 'font-size:11px;'),
     sep(),
     btn(svgs.code, 'Code', () => dispatchKey('e')),
     sep(),
-    btn(svgs.link, 'Add Link', () => {
-      const url = prompt('Enter URL:');
-      if (url) document.execCommand('createLink', false, url);
-    }),
+    linkBtn,
     btn(svgs.unlink, 'Remove Link', () => document.execCommand('unlink')),
     sep(),
     btn(svgs.image, 'Insert Image', () => {
