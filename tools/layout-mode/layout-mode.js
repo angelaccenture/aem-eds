@@ -84,7 +84,13 @@ function applyLayoutModeUI() {
     clearSelection();
 
     const isText = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
-    if (isText) return;
+    if (isText) {
+      if (blockBar) blockBar.style.display = 'none';
+      if (sectionBar) sectionBar.style.display = 'none';
+      return;
+    }
+
+    if (toolbar) toolbar.style.display = 'none';
 
     const block = e.target.closest('[data-block-name]');
     if (block) {
