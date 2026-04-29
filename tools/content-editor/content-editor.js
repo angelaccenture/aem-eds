@@ -6,55 +6,80 @@
 function addStyles() {
   const style = document.createElement('style');
   style.textContent = `
-    .prosemirror-floating-toolbar .toolbar-btn-underline {
+    .prosemirror-floating-toolbar > .ProseMirror-menuitem,
+    .prosemirror-floating-toolbar > .ProseMirror-menuseparator {
       display: none !important;
     }
     .prosemirror-floating-toolbar {
-      background: #f5f5f5 !important;
-      border: 1px solid #ddd !important;
-      border-radius: 6px !important;
-      padding: 4px 8px !important;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 8%) !important;
+      background: #fff !important;
+      border: 1px solid #e0e0e0 !important;
+      border-radius: 4px !important;
+      padding: 2px 6px !important;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 6%) !important;
       display: flex !important;
       align-items: center !important;
-      gap: 2px !important;
+      gap: 0 !important;
+      height: 32px !important;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menuitem {
-      display: flex !important;
+    .qe-custom-toolbar {
+      display: flex;
       align-items: center;
+      gap: 0;
+      height: 100%;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > div,
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > span {
-      display: flex !important;
+    .qe-custom-toolbar .qe-separator {
+      width: 1px;
+      height: 18px;
+      background: #e0e0e0;
+      margin: 0 6px;
+    }
+    .qe-custom-toolbar .qe-btn {
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      border: none;
+      background: transparent;
+      border-radius: 3px;
       cursor: pointer;
-      color: #666;
-      transition: background 0.1s, color 0.1s;
+      color: #999;
+      padding: 0;
+      font-family: Georgia, serif;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > div:hover,
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > span:hover {
-      background: #e0e0e0;
+    .qe-custom-toolbar .qe-btn:hover {
+      background: #f0f0f0;
       color: #333;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > div.ProseMirror-menu-active,
-    .prosemirror-floating-toolbar .ProseMirror-menuitem > span.ProseMirror-menu-active {
-      background: #ddd;
-      color: #000;
+    .qe-custom-toolbar .qe-btn.active {
+      color: #333;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menu-disabled {
-      opacity: 0.3;
-      pointer-events: none;
+    .qe-custom-toolbar .qe-btn svg {
+      width: 15px;
+      height: 15px;
     }
-    .prosemirror-floating-toolbar .ProseMirror-menuseparator {
-      width: 1px !important;
-      height: 20px !important;
-      background: #ddd !important;
-      margin: 0 4px !important;
-      border: none !important;
+    .qe-custom-toolbar .qe-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 3px;
+      background: #fff;
+      font-size: 12px;
+      color: #666;
+      cursor: pointer;
+      height: 24px;
+      margin-right: 6px;
+      font-family: system-ui, sans-serif;
+    }
+    .qe-custom-toolbar .qe-dropdown:hover {
+      border-color: #ccc;
+      color: #333;
+    }
+    .qe-custom-toolbar .qe-dropdown::after {
+      content: '▾';
+      font-size: 10px;
     }
     .da-image-palettes {
       display: none;
@@ -204,69 +229,89 @@ function injectFormattingToolbar() {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'qe-custom-toolbar';
-  wrapper.style.cssText = 'display:flex;align-items:center;gap:2px;';
 
   const sep = () => {
     const s = document.createElement('span');
-    s.className = 'ProseMirror-menuseparator';
+    s.className = 'qe-separator';
     return s;
   };
 
-  const btn = (label, title, cmd) => {
-    const b = document.createElement('span');
-    b.className = 'ProseMirror-menuitem';
-    const inner = document.createElement('div');
-    inner.title = title;
-    inner.textContent = label;
-    inner.style.cssText = 'font-size:14px;font-weight:600;';
-    inner.addEventListener('click', () => {
-      document.execCommand(cmd, false, null);
-    });
-    b.appendChild(inner);
+  const btn = (svg, title, action) => {
+    const b = document.createElement('button');
+    b.className = 'qe-btn';
+    b.title = title;
+    b.innerHTML = svg;
+    b.addEventListener('click', (e) => { e.preventDefault(); action(); });
     return b;
   };
 
-  const iconBtn = (svg, title, action) => {
-    const b = document.createElement('span');
-    b.className = 'ProseMirror-menuitem';
-    const inner = document.createElement('div');
-    inner.title = title;
-    inner.innerHTML = svg;
-    inner.style.cssText = 'display:flex;align-items:center;justify-content:center;';
-    inner.addEventListener('click', action);
-    b.appendChild(inner);
+  const textBtn = (label, title, action, style) => {
+    const b = document.createElement('button');
+    b.className = 'qe-btn';
+    b.title = title;
+    b.textContent = label;
+    if (style) b.style.cssText = style;
+    b.addEventListener('click', (e) => { e.preventDefault(); action(); });
     return b;
   };
 
-  const linkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-  const unlinkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="20" x2="20" y2="4" stroke-width="1.5"/></svg>';
-  const imgSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
-  const undoSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h13a4 4 0 0 1 0 8H7"/><polyline points="7 6 3 10 7 14"/></svg>';
-  const redoSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H8a4 4 0 0 0 0 8h10"/><polyline points="17 6 21 10 17 14"/></svg>';
+  const dropdown = document.createElement('button');
+  dropdown.className = 'qe-dropdown';
+  dropdown.textContent = 'Paragraph';
+  dropdown.title = 'Block format';
+  dropdown.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.execCommand('formatBlock', false, 'p');
+  });
+
+  const svgs = {
+    bold: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>',
+    italic: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>',
+    underline: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>',
+    strikethrough: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>',
+    superscript: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 7l5.5 8H5v2h7l-1.5-2.18L12 13l1.5 2.18L12 17h7v-2h-5.5L19 7h-4l-3 4.36L9 7H5zm14-4h-2v1h2v1h-2v1h3V3h-1z"/></svg>',
+    subscript: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 7l5.5 8H5v2h7l-1.5-2.18L12 13l1.5 2.18L12 17h7v-2h-5.5L19 7h-4l-3 4.36L9 7H5zm14 10h-2v1h2v1h-2v1h3v-4h-1z"/></svg>',
+    code: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>',
+    unlink: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16v-2zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4.01 1.41-1.41L3.41 2.86 2 4.27z"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>',
+    alignLeft: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>',
+    alignCenter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>',
+    alignRight: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>',
+    undo: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>',
+    redo: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>',
+  };
 
   wrapper.append(
-    btn('B', 'Bold', 'bold'),
-    btn('I', 'Italic', 'italic'),
-    btn('U', 'Underline', 'underline'),
-    btn('S', 'Strikethrough', 'strikeThrough'),
-    btn('T', 'Superscript', 'superscript'),
-    btn('T', 'Subscript', 'subscript'),
+    dropdown,
     sep(),
-    iconBtn(linkSvg, 'Add Link', () => {
+    btn(svgs.bold, 'Bold', () => document.execCommand('bold')),
+    btn(svgs.italic, 'Italic', () => document.execCommand('italic')),
+    btn(svgs.underline, 'Underline', () => document.execCommand('underline')),
+    btn(svgs.strikethrough, 'Strikethrough', () => document.execCommand('strikeThrough')),
+    btn(svgs.superscript, 'Superscript', () => document.execCommand('superscript')),
+    btn(svgs.subscript, 'Subscript', () => document.execCommand('subscript')),
+    textBtn('T,', 'Clear formatting', () => document.execCommand('removeFormat'), 'font-size:11px;'),
+    sep(),
+    btn(svgs.code, 'Code', () => document.execCommand('formatBlock', false, 'pre')),
+    sep(),
+    btn(svgs.link, 'Add Link', () => {
       const url = prompt('Enter URL:');
       if (url) document.execCommand('createLink', false, url);
     }),
-    iconBtn(unlinkSvg, 'Remove Link', () => {
-      document.execCommand('unlink', false, null);
-    }),
+    btn(svgs.unlink, 'Remove Link', () => document.execCommand('unlink')),
     sep(),
-    iconBtn(imgSvg, 'Insert Image', () => {
+    btn(svgs.image, 'Insert Image', () => {
       const url = prompt('Enter image URL:');
       if (url) document.execCommand('insertImage', false, url);
     }),
     sep(),
-    iconBtn(undoSvg, 'Undo', () => { document.execCommand('undo'); }),
-    iconBtn(redoSvg, 'Redo', () => { document.execCommand('redo'); }),
+    btn(svgs.alignLeft, 'Align Left', () => document.execCommand('justifyLeft')),
+    btn(svgs.alignCenter, 'Align Center', () => document.execCommand('justifyCenter')),
+    btn(svgs.alignRight, 'Align Right', () => document.execCommand('justifyRight')),
+    sep(),
+    btn(svgs.undo, 'Undo', () => document.execCommand('undo')),
+    btn(svgs.redo, 'Redo', () => document.execCommand('redo')),
   );
 
   toolbar.appendChild(wrapper);
