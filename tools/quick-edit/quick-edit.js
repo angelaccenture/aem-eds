@@ -22,11 +22,6 @@ function applyCustomizations() {
     .prosemirror-floating-toolbar .toolbar-btn-underline {
       display: none !important;
     }
-    .qe-selected {
-      outline: 2px solid #0078d4 !important;
-      outline-offset: 4px;
-      border-radius: 4px;
-    }
     .da-image-palettes {
       display: none;
       position: absolute;
@@ -181,140 +176,30 @@ function applyCustomizations() {
     setTimeout(() => altEditor.querySelector('#qe-alt-input').focus(), 50);
   }
 
-  // Inject Edit Styles button into toolbar once it renders
-  function injectToolbarButtons() {
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (!toolbar || toolbar.querySelector('.toolbar-btn-styles')) return;
-
-    const stylesBtn = document.createElement('span');
-    stylesBtn.className = 'ProseMirror-menuitem';
-    const stylesBtnInner = document.createElement('div');
-    stylesBtnInner.title = 'Edit Styles';
-    stylesBtnInner.className = 'edit-styles toolbar-btn-styles ProseMirror-menu-disabled';
-    stylesBtnInner.textContent = 'Edit Styles';
-    stylesBtnInner.setAttribute('contenteditable', 'false');
-    stylesBtn.setAttribute('contenteditable', 'false');
-    stylesBtn.appendChild(stylesBtnInner);
-    stylesBtnInner.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      const selected = document.querySelector('.qe-selected');
-      if (selected) {
-        openStylePicker(selected);
-      }
-    });
-    toolbar.appendChild(stylesBtn);
-  }
-
-  // Watch for toolbar to appear and inject buttons
-  const toolbarObserver = new MutationObserver(injectToolbarButtons);
-  toolbarObserver.observe(document.body, { childList: true, subtree: true });
-
-  // Detect element type from the raw click target
-  function detectClick(rawTarget) {
-    // 1. Image — clicked on img, picture, svg, video, or any element containing only media
-    const img = rawTarget.closest('img, picture, svg, video, canvas, .product-card-image, .hero img, [class*="image"], [class*="img"]');
-    if (img) return { target: img, type: 'image' };
-
-    // Also check if rawTarget itself is media or its parent only contains media
-    if (rawTarget.tagName === 'IMG' || rawTarget.tagName === 'PICTURE'
-      || rawTarget.tagName === 'SVG' || rawTarget.tagName === 'VIDEO') {
-      return { target: rawTarget, type: 'image' };
-    }
-
-    // Check if parent is an image wrapper (contains img but no text content)
+  // Detect if click is on an image
+  function detectImage(rawTarget) {
+    const img = rawTarget.closest('img, picture, svg, video, canvas, [class*="image"], [class*="img"]');
+    if (img) return img;
+    if (rawTarget.tagName === 'IMG' || rawTarget.tagName === 'PICTURE') return rawTarget;
     const parent = rawTarget.parentElement;
-    if (parent && parent.querySelector('img') && !parent.textContent.trim()) {
-      return { target: parent, type: 'image' };
-    }
-
-    // 2. Text — clicked on a text element
-    const text = rawTarget.closest('p, h1, h2, h3, h4, h5, h6, li, a, span');
-    if (text) return { target: text, type: 'text' };
-
-    // 3. Block — clicked on a block container (not text/image inside it)
-    const block = rawTarget.closest('[data-block-name]');
-    if (block) return { target: block, type: 'block' };
-
-    // 4. Section — clicked on the section background
-    const section = rawTarget.closest('.section');
-    if (section) return { target: section, type: 'section' };
-
-    return { target: rawTarget, type: 'text' };
+    if (parent && parent.querySelector('img') && !parent.textContent.trim()) return parent;
+    return null;
   }
 
-  // Show toolbar and reposition above the clicked element
+  // Handle image clicks for alt text editing
   document.addEventListener('click', (e) => {
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (toolbar && toolbar.contains(e.target)) return;
     if (altEditor.contains(e.target)) return;
-
-    // Close alt editor if open
     altEditor.classList.remove('open');
 
-    // Remove previous selection outline
-    document.querySelectorAll('.qe-selected').forEach((el) => el.classList.remove('qe-selected'));
-
-    // Detect what was clicked
-    const { target, type } = detectClick(e.target);
-    target.classList.add('qe-selected');
-
-    // Handle image clicks immediately — no toolbar dependency
-    if (type === 'image') {
-      const img = target.tagName === 'IMG' ? target : target.querySelector('img');
+    const imgTarget = detectImage(e.target);
+    if (imgTarget) {
+      const img = imgTarget.tagName === 'IMG' ? imgTarget : imgTarget.querySelector('img');
       if (img) {
+        const toolbar = document.querySelector('.prosemirror-floating-toolbar');
         if (toolbar) toolbar.style.display = 'none';
         openAltEditor(img);
-        return;
       }
     }
-
-    // For non-image types, toolbar must exist
-    if (!toolbar) return;
-
-    toolbar.style.display = 'block';
-
-    const stylesBtnInnerEl = toolbar.querySelector('.toolbar-btn-styles');
-    const stylesBtnWrap = stylesBtnInnerEl?.closest('.ProseMirror-menuitem');
-
-    // Hide all toolbar children first
-    [...toolbar.children].forEach((child) => {
-      child.style.display = 'none';
-    });
-
-    if (stylesBtnInnerEl) stylesBtnInnerEl.classList.add('ProseMirror-menu-disabled');
-
-    // Show buttons based on detected type
-    if (type === 'block' || type === 'section') {
-      if (stylesBtnWrap) stylesBtnWrap.style.display = '';
-      if (stylesBtnInnerEl) stylesBtnInnerEl.classList.remove('ProseMirror-menu-disabled');
-    } else {
-      // Text — show all default buttons, hide custom ones
-      [...toolbar.children].forEach((child) => {
-        if (child === stylesBtnWrap) {
-          child.style.display = 'none';
-        } else {
-          child.style.display = '';
-        }
-      });
-    }
-
-    // Position toolbar above the element
-    const rect = target.getBoundingClientRect();
-    const toolbarHeight = toolbar.offsetHeight || 40;
-
-    let top = rect.top + window.scrollY - toolbarHeight - 8;
-    if (top < window.scrollY) {
-      top = rect.bottom + window.scrollY + 8;
-    }
-
-    const left = Math.max(8, Math.min(
-      rect.left + (rect.width / 2) - (toolbar.offsetWidth / 2),
-      window.innerWidth - toolbar.offsetWidth - 8,
-    ));
-
-    toolbar.style.position = 'absolute';
-    toolbar.style.top = `${top}px`;
-    toolbar.style.left = `${left}px`;
   });
 }
 async function loadModule(origin, payload) {
