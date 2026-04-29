@@ -9,6 +9,15 @@ function addStyles() {
     .prosemirror-floating-toolbar > *:not(.qe-custom-toolbar) {
       display: none !important;
     }
+    .da-floating-toolbar,
+    .da-toolbar,
+    [class*="da-"] button[class*="bold"],
+    [class*="da-"] button[class*="italic"],
+    [class*="da-"] button[class*="underline"],
+    .ProseMirror-gapcursor + div,
+    div[class*="toolbar"]:not(.prosemirror-floating-toolbar):not(.qe-custom-toolbar) {
+      display: none !important;
+    }
     .prosemirror-floating-toolbar {
       background: #fff !important;
       border: 1px solid #e0e0e0 !important;
