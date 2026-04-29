@@ -3,6 +3,7 @@ import initStylePicker, { openStylePicker } from './style-picker.js';
 import injectToolbarButtons from '../toolbar-buttons/toolbar-buttons.js';
 import initContentEditor from '../content-editor/content-editor.js';
 import initSectionManager from './section-manager.js';
+import initBlockPicker, { openBlockPicker } from './block-picker.js';
 
 const importMap = {
   imports: {
@@ -123,6 +124,15 @@ async function loadModule(origin, payload) {
   applyLayoutModeUI();
   initStylePicker();
   initSectionManager();
+  initBlockPicker();
+
+  document.addEventListener('click', (e) => {
+    const section = e.target.closest('.section.lm-new-section');
+    if (section) {
+      e.stopPropagation();
+      openBlockPicker(section);
+    }
+  });
 
   const observer = new MutationObserver(injectToolbarButtons);
   observer.observe(document.body, { childList: true, subtree: true });
