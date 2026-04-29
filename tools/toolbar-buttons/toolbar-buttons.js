@@ -153,6 +153,92 @@ function addStyles() {
     .quick-edit-buttons .quick-edit-close,
     .quick-edit-buttons .quick-edit-exit,
     .quick-edit-buttons .quick-edit-preview { display: none !important; }
+    .qe-publish-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300000;
+      background: rgb(0 0 0 / 40%);
+      align-items: center;
+      justify-content: center;
+    }
+    .qe-publish-overlay.open { display: flex; }
+    .qe-publish-dialog {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgb(0 0 0 / 20%);
+      padding: 32px;
+      min-width: 320px;
+      max-width: 400px;
+      font-family: system-ui, sans-serif;
+    }
+    .qe-publish-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .qe-publish-desc {
+      font-size: 14px;
+      color: #555;
+      margin: 0 0 20px;
+    }
+    .qe-publish-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 15px;
+      color: #333;
+    }
+    .qe-publish-option:hover {
+      border-color: #ccc;
+      background: #fafafa;
+    }
+    .qe-publish-option:has(input:checked) {
+      border-color: #0078d4;
+      background: #f0f7ff;
+    }
+    .qe-publish-option input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #0078d4;
+      margin: 0;
+    }
+    .qe-publish-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .qe-publish-cancel {
+      padding: 8px 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .qe-publish-cancel:hover { background: #f5f5f5; }
+    .qe-publish-confirm {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #0078d4;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .qe-publish-confirm:hover { background: #0067b8; }
   `;
   document.head.appendChild(style);
 }
@@ -316,21 +402,56 @@ function createPublishButton() {
   const btn = document.createElement('button');
   btn.className = 'quick-edit-publish';
   btn.textContent = 'Publish';
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Publishing...';
-    try {
-      const { owner, repo, pagePath } = getHostParts();
-      const resp = await fetch(`https://admin.hlx.page/live/${owner}/${repo}/main${pagePath}`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      btn.textContent = resp.ok ? 'Published!' : 'Failed';
-    } catch {
-      btn.textContent = 'Failed';
-    }
-    setTimeout(() => { btn.textContent = 'Publish'; btn.disabled = false; }, 2000);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'qe-publish-overlay';
+  overlay.innerHTML = `
+    <div class="qe-publish-dialog">
+      <span class="qe-publish-title">Publish</span>
+      <p class="qe-publish-desc">Select an action for this page:</p>
+      <label class="qe-publish-option">
+        <input type="radio" name="qe-publish-action" value="checklist" checked>
+        <span>Pre-Live Checklist</span>
+      </label>
+      <label class="qe-publish-option">
+        <input type="radio" name="qe-publish-action" value="approval">
+        <span>Send for Approval</span>
+      </label>
+      <label class="qe-publish-option">
+        <input type="radio" name="qe-publish-action" value="publish">
+        <span>Publish</span>
+      </label>
+      <div class="qe-publish-actions">
+        <button class="qe-publish-cancel">Cancel</button>
+        <button class="qe-publish-confirm">Continue</button>
+      </div>
+    </div>
+  `;
+
+  overlay.querySelector('.qe-publish-cancel').addEventListener('click', () => {
+    overlay.classList.remove('open');
   });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+
+  overlay.querySelector('.qe-publish-confirm').addEventListener('click', () => {
+    const selected = overlay.querySelector('input[name="qe-publish-action"]:checked').value;
+    overlay.classList.remove('open');
+    // Placeholder — actions to be wired up later
+    // eslint-disable-next-line no-console
+    console.log('Publish action selected:', selected);
+  });
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!document.body.contains(overlay)) {
+      document.body.appendChild(overlay);
+    }
+    overlay.classList.add('open');
+  });
+
   return btn;
 }
 
