@@ -2,10 +2,7 @@ const PAGE_FIELDS = [
   { id: 'page-title', label: 'Title', prop: 'og:title', type: 'property' },
   { id: 'page-description', label: 'Description', prop: 'og:description', type: 'property', textarea: true },
   { id: 'page-template', label: 'Template', prop: 'template', type: 'name' },
-  { id: 'page-header', label: 'Header', prop: 'header', type: 'name', placeholder: 'header or off' },
-  { id: 'page-footer', label: 'Footer', prop: 'footer', type: 'name', placeholder: '/fragments/nav/footer' },
   { id: 'page-breadcrumbs', label: 'Breadcrumbs', prop: 'breadcrumbs', type: 'name', placeholder: '/fragments/breadcrumbs' },
-  { id: 'page-favicon', label: 'Favicon', prop: 'favicon', type: 'name', placeholder: 'favicon' },
   { id: 'page-robots', label: 'Robots', prop: 'robots', type: 'name', placeholder: 'index, follow' },
 ];
 
