@@ -33,16 +33,19 @@ function applyLayoutModeUI() {
   `;
   document.head.appendChild(style);
 
-  let contextBar = null;
+  let blockBar = null;
+  let sectionBar = null;
 
-  function showContextBar(target) {
-    if (!contextBar) {
-      contextBar = document.createElement('div');
-      contextBar.className = 'lm-context-bar';
-      contextBar.textContent = 'Test';
-      document.body.appendChild(contextBar);
-    }
-    contextBar.style.display = 'flex';
+  function createBar(text) {
+    const bar = document.createElement('div');
+    bar.className = 'lm-context-bar';
+    bar.textContent = text;
+    document.body.appendChild(bar);
+    return bar;
+  }
+
+  function positionBar(bar, target) {
+    bar.style.display = 'flex';
     const rect = target.getBoundingClientRect();
     const barHeight = 32;
     let top = rect.top + window.scrollY - barHeight - 8;
@@ -51,19 +54,30 @@ function applyLayoutModeUI() {
       rect.left + (rect.width / 2) - 40,
       window.innerWidth - 100,
     ));
-    contextBar.style.top = `${top}px`;
-    contextBar.style.left = `${left}px`;
+    bar.style.top = `${top}px`;
+    bar.style.left = `${left}px`;
+  }
+
+  function showBlockBar(target) {
+    if (!blockBar) blockBar = createBar('Test Block');
+    positionBar(blockBar, target);
+  }
+
+  function showSectionBar(target) {
+    if (!sectionBar) sectionBar = createBar('Test Section');
+    positionBar(sectionBar, target);
   }
 
   function clearSelection() {
     document.querySelectorAll('.lm-selected-section, .lm-selected-block').forEach((el) => {
       el.classList.remove('lm-selected-section', 'lm-selected-block');
     });
-    if (contextBar) contextBar.style.display = 'none';
+    if (blockBar) blockBar.style.display = 'none';
+    if (sectionBar) sectionBar.style.display = 'none';
   }
 
   document.addEventListener('click', (e) => {
-    if (contextBar && contextBar.contains(e.target)) return;
+    if ((blockBar && blockBar.contains(e.target)) || (sectionBar && sectionBar.contains(e.target))) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (toolbar && toolbar.contains(e.target)) return;
 
@@ -77,14 +91,14 @@ function applyLayoutModeUI() {
     const block = e.target.closest('[data-block-name]');
     if (block) {
       block.classList.add('lm-selected-block');
-      showContextBar(block);
+      showBlockBar(block);
       return;
     }
 
     const section = e.target.closest('.section');
     if (section) {
       section.classList.add('lm-selected-section');
-      showContextBar(section);
+      showSectionBar(section);
     }
   });
 }
