@@ -386,7 +386,6 @@ function injectPublishButton() {
 async function loadModule(origin, payload) {
   const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
   applyCustomizations();
-  initStylePicker();
 
   // Watch for quick-edit buttons to appear and inject Publish
   const observer = new MutationObserver(injectPublishButton);
