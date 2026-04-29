@@ -244,13 +244,11 @@ function applyCustomizations() {
   // Show toolbar and reposition above the clicked element
   document.addEventListener('click', (e) => {
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (!toolbar) return;
-    if (toolbar.contains(e.target)) return;
+    if (toolbar && toolbar.contains(e.target)) return;
+    if (altEditor.contains(e.target)) return;
 
     // Close alt editor if open
     altEditor.classList.remove('open');
-
-    toolbar.style.display = 'block';
 
     // Remove previous selection outline
     document.querySelectorAll('.qe-selected').forEach((el) => el.classList.remove('qe-selected'));
@@ -258,6 +256,21 @@ function applyCustomizations() {
     // Detect what was clicked
     const { target, type } = detectClick(e.target);
     target.classList.add('qe-selected');
+
+    // Handle image clicks immediately — no toolbar dependency
+    if (type === 'image') {
+      const img = target.tagName === 'IMG' ? target : target.querySelector('img');
+      if (img) {
+        if (toolbar) toolbar.style.display = 'none';
+        openAltEditor(img);
+        return;
+      }
+    }
+
+    // For non-image types, toolbar must exist
+    if (!toolbar) return;
+
+    toolbar.style.display = 'block';
 
     const stylesBtnInnerEl = toolbar.querySelector('.toolbar-btn-styles');
     const stylesBtnWrap = stylesBtnInnerEl?.closest('.ProseMirror-menuitem');
@@ -270,15 +283,7 @@ function applyCustomizations() {
     if (stylesBtnInnerEl) stylesBtnInnerEl.classList.add('ProseMirror-menu-disabled');
 
     // Show buttons based on detected type
-    if (type === 'image') {
-      // Open alt editor directly — no toolbar button needed
-      const img = target.tagName === 'IMG' ? target : target.querySelector('img');
-      if (img) {
-        toolbar.style.display = 'none';
-        openAltEditor(img);
-        return;
-      }
-    } else if (type === 'block' || type === 'section') {
+    if (type === 'block' || type === 'section') {
       if (stylesBtnWrap) stylesBtnWrap.style.display = '';
       if (stylesBtnInnerEl) stylesBtnInnerEl.classList.remove('ProseMirror-menu-disabled');
     } else {
