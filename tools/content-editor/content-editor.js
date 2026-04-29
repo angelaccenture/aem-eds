@@ -556,4 +556,16 @@ export default function initContentEditor() {
     toolbar.style.top = `${top}px`;
     toolbar.style.left = `${left}px`;
   });
+
+  document.addEventListener('selectionchange', () => {
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (!toolbar) return;
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) {
+      const editor = document.querySelector('.ProseMirror');
+      if (!editor || !editor.contains(sel?.anchorNode)) {
+        toolbar.style.display = 'none';
+      }
+    }
+  });
 }
