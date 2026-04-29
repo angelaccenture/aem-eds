@@ -301,8 +301,9 @@ function createEditButton() {
     const rect = btn.getBoundingClientRect();
     Object.assign(menu.style, {
       position: 'fixed',
-      top: `${rect.bottom + 4}px`,
+      bottom: `${window.innerHeight - rect.top + 4}px`,
       left: `${rect.left}px`,
+      top: 'auto',
       zIndex: '200000',
     });
     menu.classList.toggle('open');
