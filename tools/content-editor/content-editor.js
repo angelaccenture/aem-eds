@@ -60,7 +60,11 @@ function addStyles() {
       color: #333;
     }
     .qe-custom-toolbar .qe-btn.active {
-      color: #111;
+      color: #000;
+      background: #e8e8e8;
+    }
+    .qe-custom-toolbar .qe-btn.active svg {
+      stroke-width: 2.5;
     }
     .qe-custom-toolbar .qe-btn svg {
       width: 15px;
