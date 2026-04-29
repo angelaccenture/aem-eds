@@ -1,4 +1,5 @@
 import { loadPage } from '../../scripts/scripts.js';
+import initStylePicker, { openStylePicker } from './style-picker.js';
 
 const importMap = {
   imports: {
@@ -414,7 +415,7 @@ function generateSidekickPayload() {
 
 export default function init(payload) {
   const { search } = window.location;
-  const ref = new URLSearchParams(search).get('quick-edit');
+  const ref = new URLSearchParams(search).get('layout-mode');
   let origin;
   if (ref === 'on' || !ref) origin = 'https://da.live';
   if (ref === 'local') origin = 'http://localhost:6456';
