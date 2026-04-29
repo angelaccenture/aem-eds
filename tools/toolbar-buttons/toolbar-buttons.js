@@ -6,7 +6,6 @@ const PAGE_FIELDS = [
   { id: 'page-footer', label: 'Footer', prop: 'footer', type: 'name', placeholder: '/fragments/nav/footer' },
   { id: 'page-breadcrumbs', label: 'Breadcrumbs', prop: 'breadcrumbs', type: 'name', placeholder: '/fragments/breadcrumbs' },
   { id: 'page-favicon', label: 'Favicon', prop: 'favicon', type: 'name', placeholder: 'favicon' },
-  { id: 'page-og-image', label: 'OG Image', prop: 'og:image', type: 'property', placeholder: 'https://...' },
   { id: 'page-robots', label: 'Robots', prop: 'robots', type: 'name', placeholder: 'index, follow' },
 ];
 
