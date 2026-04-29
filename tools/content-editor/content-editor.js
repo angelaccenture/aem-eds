@@ -628,23 +628,6 @@ function injectFormattingToolbar() {
 export default function initContentEditor() {
   addStyles();
 
-  const { altEditor, open: openAltEditor } = createAltEditor();
-
   const formatObserver = new MutationObserver(injectFormattingToolbar);
   formatObserver.observe(document.body, { childList: true, subtree: true });
-
-  document.addEventListener('click', (e) => {
-    if (altEditor.contains(e.target)) return;
-    altEditor.classList.remove('open');
-
-    const imgTarget = detectImage(e.target);
-    if (imgTarget) {
-      const img = imgTarget.tagName === 'IMG' ? imgTarget : imgTarget.querySelector('img');
-      if (img) {
-        const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-        if (toolbar) toolbar.style.display = 'none';
-        openAltEditor(img);
-      }
-    }
-  });
 }
