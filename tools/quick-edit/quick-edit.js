@@ -16,11 +16,57 @@ function addImportmap() {
 }
 
 function applyCustomizations() {
-  console.log("applyCustomizations");
   const style = document.createElement('style');
   style.textContent = `
     .prosemirror-floating-toolbar .toolbar-btn-underline {
       display: none !important;
+    }
+    .prosemirror-floating-toolbar {
+      background: #f5f5f5 !important;
+      border: 1px solid #ddd !important;
+      border-radius: 6px !important;
+      padding: 4px 8px !important;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 8%) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 2px !important;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menuitem {
+      display: flex !important;
+      align-items: center;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > div,
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > span {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #666;
+      transition: background 0.1s, color 0.1s;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > div:hover,
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > span:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > div.ProseMirror-menu-active,
+    .prosemirror-floating-toolbar .ProseMirror-menuitem > span.ProseMirror-menu-active {
+      background: #ddd;
+      color: #000;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menu-disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .prosemirror-floating-toolbar .ProseMirror-menuseparator {
+      width: 1px !important;
+      height: 20px !important;
+      background: #ddd !important;
+      margin: 0 4px !important;
+      border: none !important;
     }
     .da-image-palettes {
       display: none;
@@ -175,6 +221,84 @@ function applyCustomizations() {
     altEditor.classList.add('open');
     setTimeout(() => altEditor.querySelector('#qe-alt-input').focus(), 50);
   }
+
+  // Inject custom toolbar buttons for formatting
+  function injectFormattingToolbar() {
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (!toolbar || toolbar.querySelector('.qe-custom-toolbar')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'qe-custom-toolbar';
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:2px;';
+
+    const sep = () => {
+      const s = document.createElement('span');
+      s.className = 'ProseMirror-menuseparator';
+      return s;
+    };
+
+    const btn = (label, title, cmd) => {
+      const b = document.createElement('span');
+      b.className = 'ProseMirror-menuitem';
+      const inner = document.createElement('div');
+      inner.title = title;
+      inner.textContent = label;
+      inner.style.cssText = 'font-size:14px;font-weight:600;';
+      inner.addEventListener('click', () => {
+        document.execCommand(cmd, false, null);
+      });
+      b.appendChild(inner);
+      return b;
+    };
+
+    const iconBtn = (svg, title, action) => {
+      const b = document.createElement('span');
+      b.className = 'ProseMirror-menuitem';
+      const inner = document.createElement('div');
+      inner.title = title;
+      inner.innerHTML = svg;
+      inner.style.cssText = 'display:flex;align-items:center;justify-content:center;';
+      inner.addEventListener('click', action);
+      b.appendChild(inner);
+      return b;
+    };
+
+    const linkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+    const unlinkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="20" x2="20" y2="4" stroke-width="1.5"/></svg>';
+    const imgSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+    const undoSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h13a4 4 0 0 1 0 8H7"/><polyline points="7 6 3 10 7 14"/></svg>';
+    const redoSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H8a4 4 0 0 0 0 8h10"/><polyline points="17 6 21 10 17 14"/></svg>';
+
+    wrapper.append(
+      btn('B', 'Bold', 'bold'),
+      btn('I', 'Italic', 'italic'),
+      btn('U', 'Underline', 'underline'),
+      btn('S', 'Strikethrough', 'strikeThrough'),
+      btn('T', 'Superscript', 'superscript'),
+      btn('T', 'Subscript', 'subscript'),
+      sep(),
+      iconBtn(linkSvg, 'Add Link', () => {
+        const url = prompt('Enter URL:');
+        if (url) document.execCommand('createLink', false, url);
+      }),
+      iconBtn(unlinkSvg, 'Remove Link', () => {
+        document.execCommand('unlink', false, null);
+      }),
+      sep(),
+      iconBtn(imgSvg, 'Insert Image', () => {
+        const url = prompt('Enter image URL:');
+        if (url) document.execCommand('insertImage', false, url);
+      }),
+      sep(),
+      iconBtn(undoSvg, 'Undo', () => { document.execCommand('undo'); }),
+      iconBtn(redoSvg, 'Redo', () => { document.execCommand('redo'); }),
+    );
+
+    toolbar.appendChild(wrapper);
+  }
+
+  const formatObserver = new MutationObserver(injectFormattingToolbar);
+  formatObserver.observe(document.body, { childList: true, subtree: true });
 
   // Detect if click is on an image
   function detectImage(rawTarget) {
