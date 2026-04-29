@@ -525,12 +525,22 @@ export default function initContentEditor() {
   formatObserver.observe(document.body, { childList: true, subtree: true });
 
   document.addEventListener('click', (e) => {
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    const editor = document.querySelector('.ProseMirror');
+    if (!toolbar || !editor) return;
+
+    const inToolbar = toolbar.contains(e.target);
+    const inEditor = editor.contains(e.target);
+    const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
+
+    if (!inToolbar && !inEditor && !inDialog) {
+      toolbar.style.display = 'none';
+      return;
+    }
+
     const img = e.target.closest('img');
     if (!img) return;
-    const editor = img.closest('.ProseMirror');
-    if (!editor) return;
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (!toolbar) return;
+    if (!editor.contains(img)) return;
     toolbar.style.display = 'block';
     const rect = img.getBoundingClientRect();
     const toolbarHeight = toolbar.offsetHeight || 32;
