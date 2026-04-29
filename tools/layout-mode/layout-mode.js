@@ -15,7 +15,7 @@ function addImportmap() {
 }
 
 async function loadModule(origin, payload) {
-  const { default: loadLayoutMode } = await import(`${origin}/nx/public/plugins/layout-mode/layout-mode.js`);
+  const { default: loadLayoutMode } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
   loadLayoutMode(payload, loadPage);
 }
 
