@@ -59,7 +59,9 @@ function applyLayoutModeUI() {
   }
 
   function showBlockBar(target) {
-    if (!blockBar) blockBar = createBar('Test Block');
+    if (!blockBar) blockBar = createBar('');
+    const name = target.dataset.blockName || target.classList[0] || 'Block';
+    blockBar.textContent = name;
     positionBar(blockBar, target);
   }
 
