@@ -532,6 +532,70 @@ function injectFormattingToolbar() {
 
   document.addEventListener('selectionchange', updateActiveStates);
 
+  // Image insert dialog
+  const imageDialog = document.createElement('div');
+  imageDialog.className = 'da-page-dialog';
+  imageDialog.setAttribute('contenteditable', 'false');
+  imageDialog.innerHTML = `
+    <span class="palette-title">Insert image</span>
+    <div class="palette-field">
+      <span class="palette-label">URL</span>
+      <input id="qe-img-url" class="palette-input" placeholder="https://...">
+    </div>
+    <div class="palette-field">
+      <span class="palette-label">Alt text</span>
+      <input id="qe-img-alt" class="palette-input" placeholder="Describe this image...">
+    </div>
+    <div class="palette-actions">
+      <button class="palette-btn-cancel">Cancel</button>
+      <button class="palette-btn-ok">OK</button>
+    </div>
+  `;
+
+  imageDialog.querySelector('.palette-btn-cancel').addEventListener('click', () => {
+    imageDialog.classList.remove('open');
+  });
+
+  imageDialog.querySelector('.palette-btn-ok').addEventListener('click', () => {
+    const url = imageDialog.querySelector('#qe-img-url').value;
+    const alt = imageDialog.querySelector('#qe-img-alt').value || '';
+    if (!url) { imageDialog.classList.remove('open'); return; }
+    if (savedSelection) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(savedSelection);
+    }
+    document.execCommand('insertImage', false, url);
+    const img = document.querySelector(`img[src="${url}"]`);
+    if (img) img.alt = alt;
+    imageDialog.classList.remove('open');
+  });
+
+  const imageBtn = btn(svgs.image, 'Insert Image', () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
+    imageDialog.querySelector('#qe-img-url').value = '';
+    imageDialog.querySelector('#qe-img-alt').value = '';
+    if (!document.body.contains(imageDialog)) {
+      document.body.appendChild(imageDialog);
+    }
+    const rect = imageBtn.getBoundingClientRect();
+    Object.assign(imageDialog.style, {
+      position: 'fixed',
+      top: `${rect.bottom + 4}px`,
+      left: `${Math.max(8, rect.left - 100)}px`,
+      zIndex: '200000',
+    });
+    imageDialog.classList.add('open');
+    setTimeout(() => imageDialog.querySelector('#qe-img-url').focus(), 50);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (imageDialog.classList.contains('open') && !imageDialog.contains(e.target) && !imageBtn.contains(e.target)) {
+      imageDialog.classList.remove('open');
+    }
+  });
+
   wrapper.append(
     dropdown,
     sep(),
@@ -548,14 +612,7 @@ function injectFormattingToolbar() {
     linkBtn,
     btn(svgs.unlink, 'Remove Link', () => document.execCommand('unlink')),
     sep(),
-    btn(svgs.image, 'Insert Image', () => {
-      const url = prompt('Enter image URL:');
-      if (!url) return;
-      const alt = prompt('Enter alt text:') || '';
-      document.execCommand('insertImage', false, url);
-      const img = document.querySelector(`img[src="${url}"]`);
-      if (img) img.alt = alt;
-    }),
+    imageBtn,
     sep(),
     btn(svgs.alignLeft, 'Align Left', () => document.execCommand('justifyLeft')),
     btn(svgs.alignCenter, 'Align Center', () => document.execCommand('justifyCenter')),
