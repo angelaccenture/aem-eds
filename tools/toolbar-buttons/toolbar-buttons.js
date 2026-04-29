@@ -112,6 +112,40 @@ function addStyles() {
       background: #0078d4;
       color: #fff;
     }
+    .qe-edit-menu {
+      display: none;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      padding: 12px;
+      min-width: 160px;
+      font-family: system-ui, sans-serif;
+    }
+    .qe-edit-menu.open { display: flex; flex-direction: column; gap: 6px; }
+    .qe-edit-menu .palette-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #666;
+      margin: 0 0 4px;
+    }
+    .qe-edit-menu .edit-option {
+      padding: 8px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+    }
+    .qe-edit-menu .edit-option:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+    }
     .quick-edit-buttons { display: flex !important; }
     .quick-edit-buttons .quick-edit-page-btn,
     .quick-edit-buttons .quick-edit-page-props,
@@ -230,15 +264,13 @@ function createEditButton() {
   btn.textContent = 'Edit';
 
   const menu = document.createElement('div');
-  menu.className = 'da-page-dialog';
+  menu.className = 'qe-edit-menu';
   menu.setAttribute('contenteditable', 'false');
   menu.innerHTML = `
     <span class="palette-title">Edit Mode</span>
-    <div class="palette-actions" style="flex-direction: column; gap: 8px; margin-top: 0;">
-      <button class="palette-btn-cancel edit-option" data-mode="da-edit">DA Edit</button>
-      <button class="palette-btn-cancel edit-option" data-mode="quick-edit">Quick Edit</button>
-      <button class="palette-btn-cancel edit-option" data-mode="layout-mode">Layout Mode</button>
-    </div>
+    <button class="edit-option" data-mode="da-edit">DA Edit</button>
+    <button class="edit-option" data-mode="quick-edit">Quick Edit</button>
+    <button class="edit-option" data-mode="layout-mode">Layout Mode</button>
   `;
 
   menu.querySelectorAll('.edit-option').forEach((option) => {
@@ -267,10 +299,12 @@ function createEditButton() {
       document.body.appendChild(menu);
     }
     const rect = btn.getBoundingClientRect();
-    menu.style.position = 'fixed';
-    menu.style.top = `${rect.bottom + 8}px`;
-    menu.style.left = `${rect.left}px`;
-    menu.style.right = 'auto';
+    Object.assign(menu.style, {
+      position: 'fixed',
+      top: `${rect.bottom + 4}px`,
+      left: `${rect.left}px`,
+      zIndex: '200000',
+    });
     menu.classList.toggle('open');
   });
 
