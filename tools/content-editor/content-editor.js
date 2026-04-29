@@ -449,7 +449,11 @@ function injectFormattingToolbar() {
     sep(),
     btn(svgs.image, 'Insert Image', () => {
       const url = prompt('Enter image URL:');
-      if (url) document.execCommand('insertImage', false, url);
+      if (!url) return;
+      const alt = prompt('Enter alt text:') || '';
+      document.execCommand('insertImage', false, url);
+      const img = document.querySelector(`img[src="${url}"]`);
+      if (img) img.alt = alt;
     }),
     sep(),
     btn(svgs.alignLeft, 'Align Left', () => document.execCommand('justifyLeft')),
