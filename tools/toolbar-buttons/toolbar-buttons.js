@@ -267,9 +267,10 @@ function createEditButton() {
       document.body.appendChild(menu);
     }
     const rect = btn.getBoundingClientRect();
-    menu.style.position = 'absolute';
-    menu.style.top = `${rect.bottom + window.scrollY + 8}px`;
-    menu.style.left = `${Math.max(8, rect.left)}px`;
+    menu.style.position = 'fixed';
+    menu.style.top = `${rect.bottom + 8}px`;
+    menu.style.left = `${rect.left}px`;
+    menu.style.right = 'auto';
     menu.classList.toggle('open');
   });
 
