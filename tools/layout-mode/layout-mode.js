@@ -337,11 +337,25 @@ function injectPublishButton() {
     }
     .quick-edit-publish:hover { background: #0067b8; }
     .quick-edit-publish:disabled { background: #999; cursor: not-allowed; }
+    .quick-edit-page-props {
+      display: flex;
+      background: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .quick-edit-page-props:hover { background: #f0f0f0; }
     .quick-edit-buttons { display: flex !important; }
     .quick-edit-buttons .quick-edit-exit,
-    .quick-edit-buttons .quick-edit-preview,
+    .quick-edit-buttons .quick-edit-page-props,
     .quick-edit-buttons .quick-edit-publish { display: flex !important; }
-    .quick-edit-buttons .quick-edit-close { display: none !important; }
+    .quick-edit-buttons .quick-edit-close,
+    .quick-edit-buttons .quick-edit-preview { display: none !important; }
   `;
   document.head.appendChild(style);
 
@@ -380,11 +394,26 @@ function injectPublishButton() {
     setTimeout(() => { publishBtn.textContent = 'Publish'; publishBtn.disabled = false; }, 2000);
   });
 
+  const pagePropsBtn = document.createElement('button');
+  pagePropsBtn.className = 'quick-edit-page-props';
+  pagePropsBtn.textContent = 'Page Properties';
+  pagePropsBtn.addEventListener('click', () => {
+    let { hostname } = window.location;
+    if (hostname === 'localhost') {
+      const meta = document.querySelector('meta[property="hlx:proxyUrl"]');
+      if (meta) hostname = meta.content;
+    }
+    const parts = hostname.split('.')[0].split('--');
+    const [, repo, owner] = parts;
+    const pagePath = window.location.pathname === '/' ? '/index' : window.location.pathname;
+    window.open(`https://da.live/props#/${owner}/${repo}${pagePath}`, '_blank');
+  });
+
   const previewBtn = buttonsBar.querySelector('.quick-edit-preview');
   if (previewBtn) {
-    previewBtn.after(publishBtn);
+    previewBtn.after(pagePropsBtn, publishBtn);
   } else {
-    buttonsBar.appendChild(publishBtn);
+    buttonsBar.append(pagePropsBtn, publishBtn);
   }
 }
 
