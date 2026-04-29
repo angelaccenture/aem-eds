@@ -1,0 +1,167 @@
+/* Blog template — Microsoft blog style */
+
+/* ---- Layout ---- */
+.blog-template main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-l) var(--spacing-xl);
+}
+
+.blog-template .blog-article-section > .default-content {
+  max-width: 100%;
+}
+
+/* ---- Typography ---- */
+.blog-template h1 {
+  font-size: 34px;
+  font-weight: 100;
+  line-height: 40px;
+  color: var(--color-text-dark);
+  margin: 0 0 var(--spacing-m);
+}
+
+.blog-template h3 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--color-text-dark);
+  margin: 36px 0 var(--spacing-m);
+}
+
+.blog-template main p {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--color-text-dark);
+  margin: 0 0 20px;
+}
+
+.blog-template main a:not([class]) {
+  color: var(--color-cta-hover);
+  text-decoration: underline;
+}
+
+.blog-template main a:not([class]):hover {
+  color: var(--color-cta);
+}
+
+/* ---- Post meta (date + author) ---- */
+.blog-template .blog-post-meta {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-l);
+}
+
+.blog-template .blog-post-meta a {
+  color: var(--color-text-muted);
+}
+
+.blog-template .blog-post-meta a:hover {
+  color: var(--color-cta-hover);
+}
+
+/* ---- Hero image ---- */
+.blog-template .blog-hero-image {
+  margin: 0 0 36px;
+}
+
+.blog-template .blog-hero-image picture {
+  display: block;
+}
+
+.blog-template .blog-hero-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---- Social share bar ---- */
+.blog-template .blog-share-bar {
+  display: flex;
+  gap: var(--spacing-s);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 36px;
+}
+
+.blog-template .blog-share-bar li {
+  margin: 0;
+}
+
+.blog-template .blog-share-bar a {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.blog-template .blog-share-bar img {
+  width: 28px;
+  height: 28px;
+}
+
+/* ---- Blockquotes ---- */
+.blog-template .blog-quote {
+  margin: 36px 0 12px;
+  padding: 0 var(--spacing-l);
+  border-left: 2px solid rgb(0 0 0 / 80%);
+}
+
+.blog-template .blog-quote p {
+  margin: 0 0 var(--spacing-m);
+}
+
+.blog-template .blog-quote em {
+  font-style: italic;
+  color: var(--color-text-dark);
+}
+
+/* Attribution line (e.g. "— Name, Title") */
+.blog-template .blog-quote p:last-child {
+  font-size: 18px;
+  font-weight: 200;
+  font-style: normal;
+  color: rgb(0 0 0 / 60%);
+}
+
+/* ---- Tags ---- */
+.blog-template .blog-tags {
+  margin: 36px 0 var(--spacing-m);
+  font-size: 15px;
+  color: var(--color-text-dark);
+}
+
+.blog-template .blog-tags a {
+  color: var(--color-cta-hover);
+  text-decoration: underline;
+}
+
+/* ---- Author bio ---- */
+.blog-template .blog-author-bio {
+  font-style: italic;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--color-text-dark);
+  margin: 36px 0;
+}
+
+/* ---- Responsive ---- */
+@media (width >= 900px) {
+  .blog-template main {
+    padding: 36px var(--spacing-l) var(--spacing-xxl);
+  }
+
+  .blog-template h1 {
+    font-size: 46px;
+    line-height: 52px;
+  }
+
+  .blog-template h3 {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .blog-template main p {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
