@@ -408,9 +408,103 @@ function injectFormattingToolbar() {
   superBtn.dataset.command = 'superscript';
   const subBtn = btn(svgs.subscript, 'Subscript', () => dispatchKey(',', { shift: true }));
   subBtn.dataset.command = 'subscript';
+  const linkDialog = document.createElement('div');
+  linkDialog.className = 'da-page-dialog';
+  linkDialog.setAttribute('contenteditable', 'false');
+  linkDialog.innerHTML = `
+    <span class="palette-title">Edit link</span>
+    <div class="palette-field">
+      <span class="palette-label">URL</span>
+      <input id="qe-link-url" class="palette-input" placeholder="https://...">
+    </div>
+    <div class="palette-field">
+      <span class="palette-label">Display text</span>
+      <input id="qe-link-text" class="palette-input" placeholder="Link text">
+    </div>
+    <div class="palette-field">
+      <span class="palette-label">Title</span>
+      <input id="qe-link-title" class="palette-input" placeholder="title">
+    </div>
+    <div class="palette-actions">
+      <button class="palette-btn-cancel">Cancel</button>
+      <button class="palette-btn-ok">OK</button>
+    </div>
+  `;
+
+  let savedSelection = null;
+
+  linkDialog.querySelector('.palette-btn-cancel').addEventListener('click', () => {
+    linkDialog.classList.remove('open');
+  });
+
+  linkDialog.querySelector('.palette-btn-ok').addEventListener('click', () => {
+    const url = linkDialog.querySelector('#qe-link-url').value;
+    const text = linkDialog.querySelector('#qe-link-text').value;
+    const title = linkDialog.querySelector('#qe-link-title').value;
+    if (!url) { linkDialog.classList.remove('open'); return; }
+
+    if (savedSelection) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(savedSelection);
+    }
+
+    document.execCommand('createLink', false, url);
+
+    const sel = window.getSelection();
+    if (sel.anchorNode) {
+      let node = sel.anchorNode;
+      if (node.nodeType === 3) node = node.parentElement;
+      const anchor = node.closest('a') || node.querySelector('a');
+      if (anchor) {
+        if (text) anchor.textContent = text;
+        if (title) anchor.title = title;
+      }
+    }
+
+    linkDialog.classList.remove('open');
+    savedSelection = null;
+  });
+
+  document.addEventListener('click', (e) => {
+    if (linkDialog.classList.contains('open') && !linkDialog.contains(e.target)) {
+      linkDialog.classList.remove('open');
+    }
+  });
+
   const linkBtn = btn(svgs.link, 'Add Link', () => {
-    const url = prompt('Enter URL:');
-    if (url) document.execCommand('createLink', false, url);
+    const sel = window.getSelection();
+    if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
+
+    let existingUrl = '';
+    let existingText = sel.toString() || '';
+    let existingTitle = '';
+
+    let node = sel.anchorNode;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    const existingLink = node?.closest('a');
+    if (existingLink) {
+      existingUrl = existingLink.href || '';
+      existingText = existingLink.textContent || '';
+      existingTitle = existingLink.title || '';
+    }
+
+    linkDialog.querySelector('#qe-link-url').value = existingUrl;
+    linkDialog.querySelector('#qe-link-text').value = existingText;
+    linkDialog.querySelector('#qe-link-title').value = existingTitle;
+
+    if (!document.body.contains(linkDialog)) {
+      document.body.appendChild(linkDialog);
+    }
+    const rect = linkBtn.getBoundingClientRect();
+    Object.assign(linkDialog.style, {
+      position: 'fixed',
+      top: `${rect.bottom + 4}px`,
+      left: `${Math.max(8, rect.left - 100)}px`,
+      zIndex: '200000',
+    });
+    linkDialog.classList.add('open');
+    setTimeout(() => linkDialog.querySelector('#qe-link-url').focus(), 50);
   });
   linkBtn.dataset.command = 'link';
 
