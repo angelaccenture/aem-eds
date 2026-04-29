@@ -206,7 +206,8 @@ function createPageButton(pageDialog) {
   const pageBtn = document.createElement('button');
   pageBtn.className = 'quick-edit-page-btn';
   pageBtn.textContent = 'Page';
-  pageBtn.addEventListener('click', () => {
+  pageBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (!document.body.contains(pageDialog)) {
       document.body.appendChild(pageDialog);
     }
