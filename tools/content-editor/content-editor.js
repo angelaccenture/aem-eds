@@ -51,7 +51,7 @@ function addStyles() {
       background: transparent;
       border-radius: 3px;
       cursor: pointer;
-      color: #999;
+      color: #111;
       padding: 0;
       font-family: Georgia, serif;
     }
