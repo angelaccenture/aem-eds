@@ -86,10 +86,10 @@ function applyLayoutModeUI() {
     const isText = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
     if (isText) return;
 
-    if (toolbar) toolbar.style.display = 'none';
-
     const block = e.target.closest('[data-block-name]');
     if (block) {
+      e.stopImmediatePropagation();
+      if (toolbar) toolbar.style.display = 'none';
       block.classList.add('lm-selected-block');
       showBlockBar(block);
       return;
@@ -97,6 +97,8 @@ function applyLayoutModeUI() {
 
     const section = e.target.closest('.section');
     if (section) {
+      e.stopImmediatePropagation();
+      if (toolbar) toolbar.style.display = 'none';
       section.classList.add('lm-selected-section');
       showSectionBar(section);
     }
