@@ -538,11 +538,13 @@ export default function initContentEditor() {
       return;
     }
 
-    const img = e.target.closest('img');
-    if (!img) return;
-    if (!editor.contains(img)) return;
+    if (!inEditor) return;
+
+    const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
+    if (!target) return;
+
     toolbar.style.display = 'block';
-    const rect = img.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
     const toolbarHeight = toolbar.offsetHeight || 32;
     let top = rect.top + window.scrollY - toolbarHeight - 8;
     if (top < window.scrollY) top = rect.bottom + window.scrollY + 8;
