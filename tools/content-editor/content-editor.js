@@ -272,12 +272,32 @@ function injectFormattingToolbar() {
     return s;
   };
 
+  function dispatchKey(key, opts = {}) {
+    const editor = document.querySelector('.ProseMirror');
+    if (!editor) return;
+    const eventOpts = {
+      key,
+      code: `Key${key.toUpperCase()}`,
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: opts.ctrl || false,
+      metaKey: opts.meta || false,
+      shiftKey: opts.shift || false,
+    };
+    const isMac = /Mac/.test(navigator.platform);
+    if (isMac) { eventOpts.metaKey = true; } else { eventOpts.ctrlKey = true; }
+    editor.dispatchEvent(new KeyboardEvent('keydown', eventOpts));
+  }
+
   const btn = (svg, title, action) => {
     const b = document.createElement('button');
     b.className = 'qe-btn';
     b.title = title;
     b.innerHTML = svg;
-    b.addEventListener('click', (e) => { e.preventDefault(); action(); });
+    b.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      action();
+    });
     return b;
   };
 
@@ -287,7 +307,7 @@ function injectFormattingToolbar() {
     b.title = title;
     b.textContent = label;
     if (style) b.style.cssText = style;
-    b.addEventListener('click', (e) => { e.preventDefault(); action(); });
+    b.addEventListener('mousedown', (e) => { e.preventDefault(); action(); });
     return b;
   };
 
@@ -362,15 +382,15 @@ function injectFormattingToolbar() {
   wrapper.append(
     dropdown,
     sep(),
-    btn(svgs.bold, 'Bold', () => document.execCommand('bold')),
-    btn(svgs.italic, 'Italic', () => document.execCommand('italic')),
-    btn(svgs.underline, 'Underline', () => document.execCommand('underline')),
-    btn(svgs.strikethrough, 'Strikethrough', () => document.execCommand('strikeThrough')),
-    btn(svgs.superscript, 'Superscript', () => document.execCommand('superscript')),
-    btn(svgs.subscript, 'Subscript', () => document.execCommand('subscript')),
-    textBtn('T,', 'Clear formatting', () => document.execCommand('removeFormat'), 'font-size:11px;'),
+    btn(svgs.bold, 'Bold', () => dispatchKey('b')),
+    btn(svgs.italic, 'Italic', () => dispatchKey('i')),
+    btn(svgs.underline, 'Underline', () => dispatchKey('u')),
+    btn(svgs.strikethrough, 'Strikethrough', () => dispatchKey('d', { shift: true })),
+    btn(svgs.superscript, 'Superscript', () => dispatchKey('.', { shift: true })),
+    btn(svgs.subscript, 'Subscript', () => dispatchKey(',', { shift: true })),
+    textBtn('T,', 'Clear formatting', () => dispatchKey('\\', {}), 'font-size:11px;'),
     sep(),
-    btn(svgs.code, 'Code', () => document.execCommand('formatBlock', false, 'pre')),
+    btn(svgs.code, 'Code', () => dispatchKey('e')),
     sep(),
     btn(svgs.link, 'Add Link', () => {
       const url = prompt('Enter URL:');
@@ -387,8 +407,8 @@ function injectFormattingToolbar() {
     btn(svgs.alignCenter, 'Align Center', () => document.execCommand('justifyCenter')),
     btn(svgs.alignRight, 'Align Right', () => document.execCommand('justifyRight')),
     sep(),
-    btn(svgs.undo, 'Undo', () => document.execCommand('undo')),
-    btn(svgs.redo, 'Redo', () => document.execCommand('redo')),
+    btn(svgs.undo, 'Undo', () => dispatchKey('z')),
+    btn(svgs.redo, 'Redo', () => dispatchKey('z', { shift: true })),
   );
 
   toolbar.appendChild(wrapper);
