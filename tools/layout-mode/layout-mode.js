@@ -311,11 +311,87 @@ function applyCustomizations() {
     toolbar.style.left = `${left}px`;
   });
 }
+function injectPublishButton() {
+  const buttonsBar = document.querySelector('.quick-edit-buttons');
+  if (!buttonsBar || buttonsBar.querySelector('.quick-edit-publish')) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .quick-edit-publish {
+      display: flex;
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .quick-edit-publish:hover { background: #0067b8; }
+    .quick-edit-publish:disabled { background: #999; cursor: not-allowed; }
+    .quick-edit-buttons { display: flex !important; }
+    .quick-edit-buttons .quick-edit-exit,
+    .quick-edit-buttons .quick-edit-preview,
+    .quick-edit-buttons .quick-edit-publish { display: flex !important; }
+    .quick-edit-buttons .quick-edit-close { display: none !important; }
+  `;
+  document.head.appendChild(style);
+
+  const publishBtn = document.createElement('button');
+  publishBtn.className = 'quick-edit-publish';
+  publishBtn.textContent = 'Publish';
+
+  publishBtn.addEventListener('click', async () => {
+    publishBtn.disabled = true;
+    publishBtn.textContent = 'Publishing...';
+
+    try {
+      let { hostname } = window.location;
+      if (hostname === 'localhost') {
+        const meta = document.querySelector('meta[property="hlx:proxyUrl"]');
+        if (meta) hostname = meta.content;
+      }
+      const parts = hostname.split('.')[0].split('--');
+      const [, repo, owner] = parts;
+      const pagePath = window.location.pathname === '/' ? '/index' : window.location.pathname;
+
+      const resp = await fetch(`https://admin.hlx.page/live/${owner}/${repo}/main${pagePath}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (resp.ok) {
+        publishBtn.textContent = 'Published!';
+      } else {
+        publishBtn.textContent = 'Failed';
+      }
+    } catch {
+      publishBtn.textContent = 'Failed';
+    }
+
+    setTimeout(() => { publishBtn.textContent = 'Publish'; publishBtn.disabled = false; }, 2000);
+  });
+
+  const previewBtn = buttonsBar.querySelector('.quick-edit-preview');
+  if (previewBtn) {
+    previewBtn.after(publishBtn);
+  } else {
+    buttonsBar.appendChild(publishBtn);
+  }
+}
+
 
 async function loadModule(origin, payload) {
   const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
   applyCustomizations();
   initStylePicker();
+
+  // Watch for quick-edit buttons to appear and inject Publish
+  const observer = new MutationObserver(injectPublishButton);
+  observer.observe(document.body, { childList: true, subtree: true });
+
   loadQuickEdit(payload, loadPage);
 }
 
