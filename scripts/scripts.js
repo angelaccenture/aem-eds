@@ -45,4 +45,6 @@ await loadPage();
   if (hasPreview) import('../tools/da/da.js').then((mod) => mod.default(loadPage));
   const hasQE = searchParams.has('quick-edit');
   if (hasQE) import('../tools/quick-edit/quick-edit.js').then((mod) => mod.default());
+  const hasLM = searchParams.has('layout-mode');
+  if (hasLM) import('../tools/layout-mode/layout-mode.js').then((mod) => mod.default());
 }());

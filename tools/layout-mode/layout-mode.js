@@ -14,12 +14,11 @@ function addImportmap() {
   document.head.appendChild(importmapEl);
 }
 
-async function loadMoudle(origin, payload) {
-  const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
-  loadQuickEdit(payload, loadPage);
+async function loadModule(origin, payload) {
+  const { default: loadLayoutMode } = await import(`${origin}/nx/public/plugins/layout-mode/layout-mode.js`);
+  loadLayoutMode(payload, loadPage);
 }
 
-// creates sidekick payload when loading QE from query param
 function generateSidekickPayload() {
   let { hostname } = window.location;
   if (hostname === 'localhost') {
@@ -38,11 +37,11 @@ function generateSidekickPayload() {
 
 export default function init(payload) {
   const { search } = window.location;
-  const ref = new URLSearchParams(search).get('quick-edit');
+  const ref = new URLSearchParams(search).get('layout-mode');
   let origin;
   if (ref === 'on' || !ref) origin = 'https://da.live';
   if (ref === 'local') origin = 'http://localhost:6456';
   if (!origin) origin = `https://${ref}--da-nx--adobe.aem.live`;
   addImportmap();
-  loadMoudle(origin, payload || generateSidekickPayload());
+  loadModule(origin, payload || generateSidekickPayload());
 }
