@@ -224,14 +224,55 @@ function createPageButton(pageDialog) {
   return pageBtn;
 }
 
-function createDAEditButton() {
+function createEditButton() {
   const btn = document.createElement('button');
   btn.className = 'quick-edit-page-props';
-  btn.textContent = 'DA Edit';
-  btn.addEventListener('click', () => {
-    const { owner, repo, pagePath } = getHostParts();
-    window.open(`https://da.live/edit#/${owner}/${repo}${pagePath}`, '_blank');
+  btn.textContent = 'Edit';
+
+  const menu = document.createElement('div');
+  menu.className = 'da-page-dialog';
+  menu.setAttribute('contenteditable', 'false');
+  menu.innerHTML = `
+    <span class="palette-title">Edit Mode</span>
+    <div class="palette-actions" style="flex-direction: column; gap: 8px; margin-top: 0;">
+      <button class="palette-btn-cancel edit-option" data-mode="da-edit">DA Edit</button>
+      <button class="palette-btn-cancel edit-option" data-mode="quick-edit">Quick Edit</button>
+      <button class="palette-btn-cancel edit-option" data-mode="layout-mode">Layout Mode</button>
+    </div>
+  `;
+
+  menu.querySelectorAll('.edit-option').forEach((option) => {
+    option.addEventListener('click', () => {
+      const mode = option.dataset.mode;
+      menu.classList.remove('open');
+      const { owner, repo, pagePath } = getHostParts();
+      if (mode === 'da-edit') {
+        window.open(`https://da.live/edit#/${owner}/${repo}${pagePath}`, '_blank');
+      } else {
+        const base = window.location.origin + window.location.pathname;
+        window.location.href = `${base}?${mode}=on`;
+      }
+    });
   });
+
+  document.addEventListener('click', (e) => {
+    if (menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove('open');
+    }
+  });
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!document.body.contains(menu)) {
+      document.body.appendChild(menu);
+    }
+    const rect = btn.getBoundingClientRect();
+    menu.style.position = 'absolute';
+    menu.style.top = `${rect.bottom + window.scrollY + 8}px`;
+    menu.style.left = `${Math.max(8, rect.left)}px`;
+    menu.classList.toggle('open');
+  });
+
   return btn;
 }
 
@@ -265,13 +306,13 @@ export default function injectToolbarButtons() {
 
   const pageDialog = createPageDialog();
   const pageBtn = createPageButton(pageDialog);
-  const daEditBtn = createDAEditButton();
+  const editBtn = createEditButton();
   const publishBtn = createPublishButton();
 
   const previewBtn = buttonsBar.querySelector('.quick-edit-preview');
   if (previewBtn) {
-    previewBtn.after(pageBtn, daEditBtn, publishBtn);
+    previewBtn.after(pageBtn, editBtn, publishBtn);
   } else {
-    buttonsBar.append(pageBtn, daEditBtn, publishBtn);
+    buttonsBar.append(pageBtn, editBtn, publishBtn);
   }
 }
