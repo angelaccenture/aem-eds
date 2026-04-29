@@ -405,7 +405,7 @@ function injectPublishButton() {
     const parts = hostname.split('.')[0].split('--');
     const [, repo, owner] = parts;
     const pagePath = window.location.pathname === '/' ? '/index' : window.location.pathname;
-    window.open(`https://da.live/props#/${owner}/${repo}${pagePath}`, '_blank');
+    window.open(`https://da.live/edit#/${owner}/${repo}${pagePath}`, '_blank');
   });
 
   const previewBtn = buttonsBar.querySelector('.quick-edit-preview');
