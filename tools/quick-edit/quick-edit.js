@@ -395,7 +395,7 @@ function injectPublishButton() {
 
   const pagePropsBtn = document.createElement('button');
   pagePropsBtn.className = 'quick-edit-page-props';
-  pagePropsBtn.textContent = 'Page Properties';
+  pagePropsBtn.textContent = 'DA Edit';
   pagePropsBtn.addEventListener('click', () => {
     let { hostname } = window.location;
     if (hostname === 'localhost') {
