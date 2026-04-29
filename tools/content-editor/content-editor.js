@@ -316,8 +316,6 @@ function injectFormattingToolbar() {
   dropdown.textContent = 'Paragraph';
   dropdown.title = 'Block format';
 
-  const dropdownMenu = document.createElement('div');
-  dropdownMenu.className = 'qe-dropdown-menu';
   const formats = [
     { label: 'Paragraph', tag: 'p' },
     { label: 'Heading 1', tag: 'h1' },
@@ -328,11 +326,29 @@ function injectFormattingToolbar() {
     { label: 'Heading 6', tag: 'h6' },
     { label: 'Code Block', tag: 'pre' },
   ];
+
+  function updateDropdownLabel() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    let node = sel.anchorNode;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    if (!node) return;
+    const block = node.closest('h1,h2,h3,h4,h5,h6,pre,p');
+    if (!block) return;
+    const tag = block.tagName.toLowerCase();
+    const match = formats.find((f) => f.tag === tag);
+    dropdown.textContent = match ? match.label : 'Paragraph';
+  }
+
+  document.addEventListener('selectionchange', updateDropdownLabel);
+
+  const dropdownMenu = document.createElement('div');
+  dropdownMenu.className = 'qe-dropdown-menu';
   formats.forEach(({ label, tag }) => {
     const opt = document.createElement('button');
     opt.className = 'qe-dropdown-option';
     opt.textContent = label;
-    opt.addEventListener('click', (e) => {
+    opt.addEventListener('mousedown', (e) => {
       e.preventDefault();
       e.stopPropagation();
       document.execCommand('formatBlock', false, tag);
@@ -342,16 +358,17 @@ function injectFormattingToolbar() {
     dropdownMenu.appendChild(opt);
   });
 
-  dropdown.addEventListener('click', (e) => {
+  dropdown.addEventListener('mousedown', (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!document.body.contains(dropdownMenu)) {
       document.body.appendChild(dropdownMenu);
     }
     const rect = dropdown.getBoundingClientRect();
-    dropdownMenu.style.position = 'absolute';
-    dropdownMenu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+    dropdownMenu.style.position = 'fixed';
+    dropdownMenu.style.top = `${rect.bottom + 4}px`;
     dropdownMenu.style.left = `${rect.left}px`;
+    dropdownMenu.style.zIndex = '200000';
     dropdownMenu.classList.toggle('open');
   });
 
