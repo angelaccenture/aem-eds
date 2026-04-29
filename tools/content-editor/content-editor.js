@@ -425,6 +425,10 @@ function injectFormattingToolbar() {
       <span class="palette-label">Title</span>
       <input id="qe-link-title" class="palette-input" placeholder="title">
     </div>
+    <div class="palette-field" style="flex-direction:row;align-items:center;display:flex;gap:8px;">
+      <input type="checkbox" id="qe-link-newtab" style="width:auto;margin:0;">
+      <label for="qe-link-newtab" style="font-size:13px;font-weight:600;color:#000;cursor:pointer;">Open in New Window</label>
+    </div>
     <div class="palette-actions">
       <button class="palette-btn-cancel">Cancel</button>
       <button class="palette-btn-ok">OK</button>
@@ -441,6 +445,7 @@ function injectFormattingToolbar() {
     const url = linkDialog.querySelector('#qe-link-url').value;
     const text = linkDialog.querySelector('#qe-link-text').value;
     const title = linkDialog.querySelector('#qe-link-title').value;
+    const newTab = linkDialog.querySelector('#qe-link-newtab').checked;
     if (!url) { linkDialog.classList.remove('open'); return; }
 
     if (savedSelection) {
@@ -459,6 +464,7 @@ function injectFormattingToolbar() {
       if (anchor) {
         if (text) anchor.textContent = text;
         if (title) anchor.title = title;
+        if (newTab) { anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; } else { anchor.removeAttribute('target'); anchor.removeAttribute('rel'); }
       }
     }
 
@@ -492,6 +498,7 @@ function injectFormattingToolbar() {
     linkDialog.querySelector('#qe-link-url').value = existingUrl;
     linkDialog.querySelector('#qe-link-text').value = existingText;
     linkDialog.querySelector('#qe-link-title').value = existingTitle;
+    linkDialog.querySelector('#qe-link-newtab').checked = existingLink?.target === '_blank';
 
     if (!document.body.contains(linkDialog)) {
       document.body.appendChild(linkDialog);
