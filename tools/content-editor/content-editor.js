@@ -658,10 +658,18 @@ export default function initContentEditor() {
     const editor = img.closest('.ProseMirror');
     if (!editor) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (toolbar) toolbar.style.display = 'none';
-    const customToolbar = document.querySelector('.qe-custom-toolbar');
-    if (customToolbar && customToolbar._openImageDialog) {
-      customToolbar._openImageDialog(img, img);
-    }
+    if (!toolbar) return;
+    toolbar.style.display = 'block';
+    const rect = img.getBoundingClientRect();
+    const toolbarHeight = toolbar.offsetHeight || 32;
+    let top = rect.top + window.scrollY - toolbarHeight - 8;
+    if (top < window.scrollY) top = rect.bottom + window.scrollY + 8;
+    const left = Math.max(8, Math.min(
+      rect.left + (rect.width / 2) - (toolbar.offsetWidth / 2),
+      window.innerWidth - toolbar.offsetWidth - 8,
+    ));
+    toolbar.style.position = 'absolute';
+    toolbar.style.top = `${top}px`;
+    toolbar.style.left = `${left}px`;
   });
 }
