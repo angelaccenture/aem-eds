@@ -89,6 +89,34 @@ function addStyles() {
       content: '▾';
       font-size: 10px;
     }
+    .qe-dropdown-menu {
+      display: none;
+      position: absolute;
+      z-index: 100002;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+      padding: 4px 0;
+      min-width: 140px;
+      font-family: system-ui, sans-serif;
+    }
+    .qe-dropdown-menu.open { display: block; }
+    .qe-dropdown-option {
+      display: block;
+      width: 100%;
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .qe-dropdown-option:hover {
+      background: #f0f0f0;
+    }
     .da-image-palettes {
       display: none;
       position: absolute;
@@ -267,9 +295,50 @@ function injectFormattingToolbar() {
   dropdown.className = 'qe-dropdown';
   dropdown.textContent = 'Paragraph';
   dropdown.title = 'Block format';
+
+  const dropdownMenu = document.createElement('div');
+  dropdownMenu.className = 'qe-dropdown-menu';
+  const formats = [
+    { label: 'Paragraph', tag: 'p' },
+    { label: 'Heading 1', tag: 'h1' },
+    { label: 'Heading 2', tag: 'h2' },
+    { label: 'Heading 3', tag: 'h3' },
+    { label: 'Heading 4', tag: 'h4' },
+    { label: 'Heading 5', tag: 'h5' },
+    { label: 'Heading 6', tag: 'h6' },
+    { label: 'Code Block', tag: 'pre' },
+  ];
+  formats.forEach(({ label, tag }) => {
+    const opt = document.createElement('button');
+    opt.className = 'qe-dropdown-option';
+    opt.textContent = label;
+    opt.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.execCommand('formatBlock', false, tag);
+      dropdown.textContent = label;
+      dropdownMenu.classList.remove('open');
+    });
+    dropdownMenu.appendChild(opt);
+  });
+
   dropdown.addEventListener('click', (e) => {
     e.preventDefault();
-    document.execCommand('formatBlock', false, 'p');
+    e.stopPropagation();
+    if (!document.body.contains(dropdownMenu)) {
+      document.body.appendChild(dropdownMenu);
+    }
+    const rect = dropdown.getBoundingClientRect();
+    dropdownMenu.style.position = 'absolute';
+    dropdownMenu.style.top = `${rect.bottom + window.scrollY + 4}px`;
+    dropdownMenu.style.left = `${rect.left}px`;
+    dropdownMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.remove('open');
+    }
   });
 
   const svgs = {
