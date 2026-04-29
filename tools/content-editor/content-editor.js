@@ -6,8 +6,7 @@
 function addStyles() {
   const style = document.createElement('style');
   style.textContent = `
-    .prosemirror-floating-toolbar > .ProseMirror-menuitem,
-    .prosemirror-floating-toolbar > .ProseMirror-menuseparator {
+    .prosemirror-floating-toolbar > *:not(.qe-custom-toolbar) {
       display: none !important;
     }
     .prosemirror-floating-toolbar {
