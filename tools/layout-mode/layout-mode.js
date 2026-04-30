@@ -303,15 +303,45 @@ function applyLayoutModeUI() {
       }
     }
 
-    // Fallback: prompt the author
-    const input = prompt(
-      'DA token required to save changes.\n\n'
-      + 'To get your token:\n'
-      + '1. Go to da.live and sign in\n'
-      + '2. Open DevTools Console\n'
-      + '3. Run: copy((await (await fetch("https://admin.da.live/auth/me")).json()).token)\n'
-      + '4. Paste it here:',
-    );
+    // Fallback: prompt the author with a copyable dialog
+    const tokenDialog = document.createElement('div');
+    tokenDialog.style.cssText = 'position:fixed;inset:0;z-index:400000;background:rgb(0 0 0/40%);display:flex;align-items:center;justify-content:center;';
+    tokenDialog.innerHTML = `
+      <div style="background:#fff;border-radius:12px;padding:24px;max-width:440px;font-family:system-ui,sans-serif;box-shadow:0 8px 32px rgb(0 0 0/20%);">
+        <h3 style="margin:0 0 12px;font-size:16px;">DA Token Required</h3>
+        <p style="margin:0 0 8px;font-size:13px;color:#555;">To save style changes, paste your DA token below.</p>
+        <p style="margin:0 0 4px;font-size:13px;color:#555;">Get your token — run this in the DevTools Console on da.live:</p>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <input readonly value='copy((await (await fetch("https://admin.da.live/auth/me")).json()).token)' style="flex:1;padding:8px;border:1px solid #e0e0e0;border-radius:4px;font-size:12px;font-family:monospace;">
+          <button class="da-token-copy" style="padding:8px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">Copy</button>
+        </div>
+        <input class="da-token-input" placeholder="Paste token here..." style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #e0e0e0;border-radius:6px;font-size:14px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="da-token-cancel" style="padding:8px 20px;border:1px solid #ccc;border-radius:6px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+          <button class="da-token-ok" style="padding:8px 20px;border:none;border-radius:6px;background:#0078d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">OK</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(tokenDialog);
+
+    tokenDialog.querySelector('.da-token-copy').addEventListener('click', () => {
+      const cmd = tokenDialog.querySelector('input[readonly]');
+      navigator.clipboard.writeText(cmd.value);
+      tokenDialog.querySelector('.da-token-copy').textContent = 'Copied!';
+    });
+
+    const input = await new Promise((resolve) => {
+      tokenDialog.querySelector('.da-token-cancel').addEventListener('click', () => {
+        tokenDialog.remove();
+        resolve(null);
+      });
+      tokenDialog.querySelector('.da-token-ok').addEventListener('click', () => {
+        const val = tokenDialog.querySelector('.da-token-input').value.trim();
+        tokenDialog.remove();
+        resolve(val || null);
+      });
+    });
     if (input) {
       const trimmed = input.trim();
       sessionStorage.setItem('da-token', trimmed);
