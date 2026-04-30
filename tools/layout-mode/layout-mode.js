@@ -460,16 +460,14 @@ function applyLayoutModeUI() {
           menu.appendChild(option);
         });
 
-        trigger.addEventListener('click', (ev) => {
+        trigger.addEventListener('mousedown', (ev) => {
+          ev.preventDefault();
           ev.stopPropagation();
+          ev.stopImmediatePropagation();
           const rect = trigger.getBoundingClientRect();
           menu.style.top = `${rect.bottom + 4}px`;
           menu.style.left = `${rect.left}px`;
           menu.classList.toggle('open');
-        });
-
-        document.addEventListener('click', (ev) => {
-          if (!wrapper.contains(ev.target)) menu.classList.remove('open');
         });
 
         wrapper.append(trigger);
@@ -647,8 +645,13 @@ function applyLayoutModeUI() {
 
   document.addEventListener('click', (e) => {
     if (contextBar && contextBar.contains(e.target)) return;
+    const openMenu = document.querySelector('.lm-classes-menu.open');
+    if (openMenu && openMenu.contains(e.target)) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (toolbar && toolbar.contains(e.target)) return;
+
+    // Close any open styles menu
+    document.querySelectorAll('.lm-classes-menu.open').forEach((m) => m.classList.remove('open'));
 
     clearSelection();
 
