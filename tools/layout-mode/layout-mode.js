@@ -715,7 +715,50 @@ function generateSidekickPayload() {
   };
 }
 
+function showLoader() {
+  const loader = document.createElement('div');
+  loader.id = 'lm-loader';
+  loader.innerHTML = `
+    <style>
+      #lm-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 500000;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        font-family: system-ui, sans-serif;
+      }
+      #lm-loader .lm-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #e0e0e0;
+        border-top-color: #0078d4;
+        border-radius: 50%;
+        animation: lm-spin 0.8s linear infinite;
+      }
+      @keyframes lm-spin { to { transform: rotate(360deg); } }
+      #lm-loader .lm-loader-text {
+        font-size: 14px;
+        color: #555;
+      }
+    </style>
+    <div class="lm-spinner"></div>
+    <span class="lm-loader-text">Loading Layout Mode...</span>
+  `;
+  document.body.appendChild(loader);
+}
+
+function hideLoader() {
+  const loader = document.getElementById('lm-loader');
+  if (loader) loader.remove();
+}
+
 export default function init(payload) {
+  showLoader();
   const { search } = window.location;
   const ref = new URLSearchParams(search).get('layout-mode');
   let origin;
@@ -723,5 +766,5 @@ export default function init(payload) {
   if (ref === 'local') origin = 'http://localhost:6456';
   if (!origin) origin = `https://${ref}--da-nx--adobe.aem.live`;
   addImportmap();
-  loadModule(origin, payload || generateSidekickPayload());
+  loadModule(origin, payload || generateSidekickPayload()).then(hideLoader);
 }
