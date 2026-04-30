@@ -6,52 +6,51 @@
       },
       "hero": {
         "label": "Hero",
-        "variants": ["center", "dark"],
         "properties": [
-          { "name": "style", "type": "select", "options": ["default", "center", "dark"] }
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/hero" }
         ]
       },
       "card": {
         "label": "Card",
-        "variants": ["horizontal"],
         "properties": [
-          { "name": "style", "type": "select", "options": ["default", "horizontal"] }
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/card" }
         ]
       },
       "teaser": {
         "label": "Teaser",
-        "variants": [],
-        "properties": []
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/teaser" }
+        ]
       },
       "columns": {
         "label": "Columns",
-        "variants": [],
-        "properties": []
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/columns" }
+        ]
       },
       "advanced-accordion": {
         "label": "Accordion",
-        "variants": ["compact"],
         "properties": [
-          { "name": "style", "type": "select", "options": ["default", "compact"] }
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-accordion" }
         ]
       },
       "advanced-carousel": {
         "label": "Carousel",
-        "variants": [],
-        "properties": []
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-carousel" }
+        ]
       },
       "advanced-tabs": {
         "label": "Tabs",
-        "variants": [],
-        "properties": []
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-tabs" }
+        ]
       }
     },
     "sections": {
       "actions": ["add-block", "move-up", "move-down", "delete"],
       "properties": [
-        { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
-        { "name": "grid", "type": "select", "options": ["none", "2", "3", "4", "5", "6"] },
-        { "name": "spacing", "type": "select", "options": ["none", "xs", "s", "m", "l", "xl", "xxl"] }
+        { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/sections" }
       ]
     }
   },

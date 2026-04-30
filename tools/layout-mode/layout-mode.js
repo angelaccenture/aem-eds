@@ -57,6 +57,50 @@ function applyLayoutModeUI() {
       background: #f0f0f0;
       color: #111;
     }
+    .lm-classes-dropdown {
+      position: relative;
+      display: inline-flex;
+    }
+    .lm-classes-trigger {
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #333;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .lm-classes-trigger:hover { border-color: #ccc; }
+    .lm-classes-trigger::after { content: ' ▾'; font-size: 9px; }
+    .lm-classes-menu {
+      display: none;
+      position: fixed;
+      z-index: 200000;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      padding: 8px 0;
+      min-width: 160px;
+      max-height: 240px;
+      overflow-y: auto;
+      font-family: system-ui, sans-serif;
+    }
+    .lm-classes-menu.open { display: block; }
+    .lm-classes-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+    }
+    .lm-classes-option:hover { background: #f5f5f5; }
+    .lm-classes-option input { margin: 0; accent-color: #0078d4; }
+    .lm-classes-option.active { font-weight: 600; }
   `;
   document.head.appendChild(style);
 
@@ -94,6 +138,59 @@ function applyLayoutModeUI() {
     nameSpan.textContent = label;
     nameSpan.style.cssText = 'font-weight:600;margin-right:12px;';
     bar.appendChild(nameSpan);
+
+    const properties = config.properties || [];
+    properties.forEach((prop) => {
+      if (prop.name === 'classes' && prop.options && prop.options.length) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'lm-classes-dropdown';
+
+        const trigger = document.createElement('button');
+        trigger.className = 'lm-classes-trigger';
+        trigger.textContent = 'Styles';
+
+        const menu = document.createElement('div');
+        menu.className = 'lm-classes-menu';
+
+        prop.options.forEach((cls) => {
+          const option = document.createElement('label');
+          option.className = 'lm-classes-option';
+          const isActive = target.classList.contains(cls);
+          if (isActive) option.classList.add('active');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = isActive;
+          checkbox.addEventListener('change', () => {
+            target.classList.toggle(cls, checkbox.checked);
+            option.classList.toggle('active', checkbox.checked);
+          });
+          const text = document.createElement('span');
+          text.textContent = cls;
+          option.append(checkbox, text);
+          menu.appendChild(option);
+        });
+
+        trigger.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const rect = trigger.getBoundingClientRect();
+          menu.style.top = `${rect.bottom + 4}px`;
+          menu.style.left = `${rect.left}px`;
+          menu.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (ev) => {
+          if (!wrapper.contains(ev.target)) menu.classList.remove('open');
+        });
+
+        wrapper.append(trigger);
+        document.body.appendChild(menu);
+        bar.appendChild(wrapper);
+      }
+    });
+
+    const sep = document.createElement('span');
+    sep.style.cssText = 'width:1px;height:16px;background:#e0e0e0;margin:0 6px;';
+    if (config.actions && config.actions.length && properties.length) bar.appendChild(sep);
 
     const actions = config.actions || [];
     actions.forEach((action) => {
