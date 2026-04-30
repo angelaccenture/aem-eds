@@ -430,6 +430,8 @@ function applyLayoutModeUI() {
     }
   }
 
+  window._lmSaveAllChanges = saveAllChanges;
+
   function renderActions(config, label, target) {
     const bar = ensureBar();
     bar.innerHTML = '';
@@ -750,7 +752,7 @@ function injectSaveButton() {
     if (!saveBtn.classList.contains('has-changes')) return;
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving...';
-    await saveAllChanges();
+    await window._lmSaveAllChanges();
     saveBtn.textContent = 'Save';
     saveBtn.disabled = false;
   });
