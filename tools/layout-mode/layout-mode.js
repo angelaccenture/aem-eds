@@ -642,6 +642,7 @@ function applyLayoutModeUI() {
     });
     hoverTarget = null;
     if (contextBar) contextBar.style.display = 'none';
+    document.querySelectorAll('.lm-classes-menu').forEach((m) => m.remove());
   }
 
   document.addEventListener('click', (e) => {
