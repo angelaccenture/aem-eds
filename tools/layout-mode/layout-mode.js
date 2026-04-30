@@ -31,6 +31,16 @@ function applyLayoutModeUI() {
       border: none !important;
       background: transparent !important;
     }
+    .lm-hover-block {
+      outline: 1.5px dashed #0078d4 !important;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .lm-hover-section {
+      outline: 3px dashed #0078d4 !important;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
     .lm-selected-section {
       outline: 3px solid #0078d4 !important;
       outline-offset: 2px;
@@ -121,6 +131,26 @@ function applyLayoutModeUI() {
   document.head.appendChild(style);
 
   let contextBar = null;
+  let hoverTarget = null;
+
+  document.addEventListener('mouseover', (e) => {
+    if (contextBar && contextBar.contains(e.target)) return;
+    if (hoverTarget) {
+      hoverTarget.classList.remove('lm-hover-block', 'lm-hover-section');
+      hoverTarget = null;
+    }
+    const block = e.target.closest('[data-block-name]');
+    if (block && !block.classList.contains('lm-selected-block')) {
+      block.classList.add('lm-hover-block');
+      hoverTarget = block;
+      return;
+    }
+    const section = e.target.closest('.section');
+    if (section && !section.classList.contains('lm-selected-section')) {
+      section.classList.add('lm-hover-section');
+      hoverTarget = section;
+    }
+  });
 
   function ensureBar() {
     if (!contextBar) {
@@ -309,9 +339,10 @@ function applyLayoutModeUI() {
   }
 
   function clearSelection() {
-    document.querySelectorAll('.lm-selected-section, .lm-selected-block').forEach((el) => {
-      el.classList.remove('lm-selected-section', 'lm-selected-block');
+    document.querySelectorAll('.lm-selected-section, .lm-selected-block, .lm-hover-block, .lm-hover-section').forEach((el) => {
+      el.classList.remove('lm-selected-section', 'lm-selected-block', 'lm-hover-block', 'lm-hover-section');
     });
+    hoverTarget = null;
     if (contextBar) contextBar.style.display = 'none';
   }
 
