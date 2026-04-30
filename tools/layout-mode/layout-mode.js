@@ -141,7 +141,7 @@ function applyLayoutModeUI() {
 
     const properties = config.properties || [];
     properties.forEach((prop) => {
-      if (prop.name === 'classes' && prop.options && prop.options.length) {
+      if (prop.name === 'classes') {
         const wrapper = document.createElement('div');
         wrapper.className = 'lm-classes-dropdown';
 
@@ -152,7 +152,14 @@ function applyLayoutModeUI() {
         const menu = document.createElement('div');
         menu.className = 'lm-classes-menu';
 
-        prop.options.forEach((cls) => {
+        const options = prop.options || [];
+        if (options.length === 0) {
+          const empty = document.createElement('div');
+          empty.style.cssText = 'padding:8px 12px;font-size:12px;color:#999;';
+          empty.textContent = 'No styles available';
+          menu.appendChild(empty);
+        }
+        options.forEach((cls) => {
           const option = document.createElement('label');
           option.className = 'lm-classes-option';
           const isActive = target.classList.contains(cls);
