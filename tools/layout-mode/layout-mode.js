@@ -272,30 +272,64 @@ function applyLayoutModeUI() {
     bar.style.left = `${left}px`;
   }
 
-  function updateBlockHeader(target, blockName, availableOptions) {
+  function getDAInfo() {
+    let { hostname } = window.location;
+    if (hostname === 'localhost') {
+      const meta = document.querySelector('meta[property="hlx:proxyUrl"]');
+      if (meta) hostname = meta.content;
+    }
+    const parts = hostname.split('.')[0].split('--');
+    const [, repo, owner] = parts;
+    const pagePath = window.location.pathname === '/' ? '/index' : window.location.pathname;
+    return { owner, repo, pagePath };
+  }
+
+  async function updateBlockHeader(target, blockName, availableOptions) {
     const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
 
-    // Strategy 1: Find the source div in ProseMirror and update its className
-    // DA's ProseMirror manages the source divs directly. The decorated block
-    // wraps the source, so we walk up to find the ProseMirror-managed element.
-    const pm = document.querySelector('.ProseMirror');
-    if (pm) {
-      // Find all divs in ProseMirror whose first class matches the block name
-      const sourceDivs = pm.querySelectorAll(`div.${blockName}`);
-      sourceDivs.forEach((sourceDiv) => {
-        // Build new className: blockName + active style classes
-        const newClasses = [blockName, ...activeClasses].join(' ');
-        if (sourceDiv.className !== newClasses) {
-          sourceDiv.className = newClasses;
-        }
-      });
-    }
-
-    // Strategy 2: Also update the decorated element's classList
+    // Update the visual (decorated) element immediately
     const decorated = target.closest('[data-block-name]') || target;
     availableOptions.forEach((cls) => {
       decorated.classList.toggle(cls, activeClasses.includes(cls));
     });
+
+    // Persist to DA: fetch source, update block class, PUT back
+    try {
+      const { owner, repo, pagePath } = getDAInfo();
+      const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
+
+      const getResp = await fetch(sourceUrl, { credentials: 'include' });
+      if (!getResp.ok) throw new Error(`Failed to fetch source: ${getResp.status}`);
+      const html = await getResp.text();
+
+      // Parse and find the block div by class name
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const blockDivs = doc.querySelectorAll(`div.${blockName}`);
+
+      if (!blockDivs.length) throw new Error(`Block div .${blockName} not found in source`);
+
+      blockDivs.forEach((div) => {
+        const newClasses = [blockName, ...activeClasses].join(' ');
+        div.className = newClasses;
+      });
+
+      // PUT the updated HTML back
+      const updatedHTML = doc.body.innerHTML;
+      const blob = new Blob([updatedHTML], { type: 'text/html' });
+      const formData = new FormData();
+      formData.append('data', blob, `${pagePath.split('/').pop()}.html`);
+
+      const putResp = await fetch(sourceUrl, {
+        method: 'PUT',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!putResp.ok) throw new Error(`Failed to save: ${putResp.status}`);
+    } catch (err) {
+      console.error('Layout Mode: Failed to persist style change to DA:', err);
+    }
   }
 
   function renderActions(config, label, target) {
