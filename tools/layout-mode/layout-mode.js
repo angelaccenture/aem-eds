@@ -146,9 +146,43 @@ function applyLayoutModeUI() {
     bar.style.left = `${left}px`;
   }
 
+  function updateBlockHeader(target, blockName, availableOptions) {
+    const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
+    const editor = target.closest('.ProseMirror');
+    if (!editor) return;
+
+    const tables = editor.querySelectorAll('table, .block-table, [class*="table"]');
+    tables.forEach((table) => {
+      const header = table.querySelector('td:first-child, th:first-child, .block-name');
+      if (!header) return;
+      const headerText = header.textContent.trim();
+      const baseName = headerText.replace(/\s*\(.*\)/, '');
+      if (baseName.toLowerCase().replace(/\s+/g, '-') === blockName) {
+        header.textContent = activeClasses.length
+          ? `${baseName} (${activeClasses.join(', ')})`
+          : baseName;
+      }
+    });
+
+    const daBlock = target.closest('[data-block-name]') || target;
+    const blockTable = daBlock.previousElementSibling;
+    if (blockTable) {
+      const cell = blockTable.querySelector('td, th, [contenteditable]');
+      if (cell) {
+        const text = cell.textContent.trim().replace(/\s*\(.*\)/, '');
+        if (text.toLowerCase().replace(/\s+/g, '-') === blockName) {
+          cell.textContent = activeClasses.length
+            ? `${text} (${activeClasses.join(', ')})`
+            : text;
+        }
+      }
+    }
+  }
+
   function renderActions(config, label, target) {
     const bar = ensureBar();
     bar.innerHTML = '';
+    const blockName = (target.dataset.blockName || target.classList[0] || '').toLowerCase();
 
     const nameSpan = document.createElement('span');
     nameSpan.textContent = label;
@@ -186,6 +220,7 @@ function applyLayoutModeUI() {
           checkbox.addEventListener('change', () => {
             target.classList.toggle(cls, checkbox.checked);
             option.classList.toggle('active', checkbox.checked);
+            updateBlockHeader(target, blockName, options);
           });
           const text = document.createElement('span');
           text.textContent = cls;
