@@ -369,16 +369,34 @@ function applyLayoutModeUI() {
     return { owner, repo, pagePath };
   }
 
-  let saveInProgress = false;
+  const pendingChanges = {};
 
-  async function persistToDA(blockName, activeClasses) {
-    if (saveInProgress) return;
-    saveInProgress = true;
+  function updateBlockHeader(target, blockName, availableOptions) {
+    const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
+
+    // Update the visual (decorated) element immediately
+    const decorated = target.closest('[data-block-name]') || target;
+    availableOptions.forEach((cls) => {
+      decorated.classList.toggle(cls, activeClasses.includes(cls));
+    });
+
+    // Track change for save
+    pendingChanges[blockName] = activeClasses;
+    showSaveButton();
+  }
+
+  function showSaveButton() {
+    const saveBtn = document.querySelector('.lm-save-btn');
+    if (saveBtn) saveBtn.classList.add('has-changes');
+  }
+
+  async function saveAllChanges() {
+    if (!Object.keys(pendingChanges).length) return;
+    const token = await getDAToken();
+    if (!token) return;
+
     try {
       const { owner, repo, pagePath } = getDAInfo();
-      const token = await getDAToken();
-      if (!token) return;
-
       const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
 
       const getResp = await fetch(sourceUrl, {
@@ -389,11 +407,11 @@ function applyLayoutModeUI() {
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      const blockDivs = doc.querySelectorAll(`div.${blockName}`);
-      if (!blockDivs.length) return;
 
-      blockDivs.forEach((div) => {
-        div.className = [blockName, ...activeClasses].join(' ');
+      Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
+        doc.querySelectorAll(`div.${blockName}`).forEach((div) => {
+          div.className = [blockName, ...activeClasses].join(' ');
+        });
       });
 
       const putResp = await fetch(sourceUrl, {
@@ -409,22 +427,7 @@ function applyLayoutModeUI() {
       }
     } catch (err) {
       console.error('Layout Mode: DA save failed:', err);
-    } finally {
-      saveInProgress = false;
     }
-  }
-
-  function updateBlockHeader(target, blockName, availableOptions) {
-    const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
-
-    // Update the visual (decorated) element immediately
-    const decorated = target.closest('[data-block-name]') || target;
-    availableOptions.forEach((cls) => {
-      decorated.classList.toggle(cls, activeClasses.includes(cls));
-    });
-
-    // Fire-and-forget DA save
-    persistToDA(blockName, activeClasses);
   }
 
   function renderActions(config, label, target) {
@@ -709,11 +712,60 @@ function addImportmap() {
   document.head.appendChild(importmapEl);
 }
 
+function injectSaveButton() {
+  const buttonsBar = document.querySelector('.quick-edit-buttons');
+  if (!buttonsBar || buttonsBar.querySelector('.lm-save-btn')) return;
+
+  // Hide publish button in layout-mode
+  const publishBtn = buttonsBar.querySelector('.quick-edit-publish');
+  if (publishBtn) publishBtn.style.display = 'none';
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .lm-save-btn {
+      display: flex;
+      background: #ccc;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: not-allowed;
+      font-family: inherit;
+    }
+    .lm-save-btn.has-changes {
+      background: #0078d4;
+      cursor: pointer;
+    }
+    .lm-save-btn.has-changes:hover { background: #0067b8; }
+    .lm-save-btn:disabled { background: #999; cursor: not-allowed; }
+  `;
+  document.head.appendChild(style);
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'lm-save-btn';
+  saveBtn.textContent = 'Save';
+  saveBtn.addEventListener('click', async () => {
+    if (!saveBtn.classList.contains('has-changes')) return;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    await saveAllChanges();
+    saveBtn.textContent = 'Save';
+    saveBtn.disabled = false;
+  });
+
+  buttonsBar.appendChild(saveBtn);
+}
+
 async function loadModule(origin, payload) {
   const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
   applyLayoutModeUI();
 
-  const observer = new MutationObserver(injectToolbarButtons);
+  const observer = new MutationObserver(() => {
+    injectToolbarButtons();
+    injectSaveButton();
+  });
   observer.observe(document.body, { childList: true, subtree: true });
 
   loadQuickEdit(payload, loadPage);
