@@ -272,6 +272,36 @@ function applyLayoutModeUI() {
     bar.style.left = `${left}px`;
   }
 
+  async function getDAToken() {
+    // Try to get token from DA's iframe via postMessage
+    const iframe = document.querySelector('#quick-edit-iframe, iframe[src*="da.live"]');
+    if (iframe) {
+      return new Promise((resolve) => {
+        const handler = (e) => {
+          if (e.data?.type === 'token') {
+            window.removeEventListener('message', handler);
+            resolve(e.data.token);
+          }
+        };
+        window.addEventListener('message', handler);
+        iframe.contentWindow.postMessage({ type: 'get-token' }, '*');
+        setTimeout(() => {
+          window.removeEventListener('message', handler);
+          resolve(null);
+        }, 2000);
+      });
+    }
+    // Fallback: try fetching from DA auth endpoint (requires same-origin cookies)
+    try {
+      const resp = await fetch('https://admin.da.live/auth/me', { credentials: 'include' });
+      if (resp.ok) {
+        const data = await resp.json();
+        return data.token || data.tokenValue || null;
+      }
+    } catch { /* ignore */ }
+    return null;
+  }
+
   function getDAInfo() {
     let { hostname } = window.location;
     if (hostname === 'localhost') {
@@ -293,16 +323,21 @@ function applyLayoutModeUI() {
       decorated.classList.toggle(cls, activeClasses.includes(cls));
     });
 
-    // Persist to DA: fetch source, update block class, PUT back
+    // Persist to DA: fetch source, modify block class, PUT back
+    // Auth: get token from DA's iframe via postMessage
     try {
       const { owner, repo, pagePath } = getDAInfo();
+      const token = await getDAToken();
+      if (!token) throw new Error('No DA token available');
+
       const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
 
-      const getResp = await fetch(sourceUrl, { credentials: 'include' });
+      const getResp = await fetch(sourceUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!getResp.ok) throw new Error(`Failed to fetch source: ${getResp.status}`);
       const html = await getResp.text();
 
-      // Parse and find the block div by class name
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       const blockDivs = doc.querySelectorAll(`div.${blockName}`);
@@ -310,20 +345,17 @@ function applyLayoutModeUI() {
       if (!blockDivs.length) throw new Error(`Block div .${blockName} not found in source`);
 
       blockDivs.forEach((div) => {
-        const newClasses = [blockName, ...activeClasses].join(' ');
-        div.className = newClasses;
+        div.className = [blockName, ...activeClasses].join(' ');
       });
 
-      // PUT the updated HTML back
       const updatedHTML = doc.body.innerHTML;
-      const blob = new Blob([updatedHTML], { type: 'text/html' });
-      const formData = new FormData();
-      formData.append('data', blob, `${pagePath.split('/').pop()}.html`);
-
       const putResp = await fetch(sourceUrl, {
         method: 'PUT',
-        credentials: 'include',
-        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'text/html',
+        },
+        body: updatedHTML,
       });
 
       if (!putResp.ok) throw new Error(`Failed to save: ${putResp.status}`);
