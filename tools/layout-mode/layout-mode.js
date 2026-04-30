@@ -275,13 +275,7 @@ function applyLayoutModeUI() {
   async function getDAToken() {
     // Check sessionStorage first
     const stored = sessionStorage.getItem('da-token');
-    if (stored) {
-      const resp = await fetch('https://admin.da.live/list/angelaccenture/aem-eds', {
-        headers: { Authorization: `Bearer ${stored}` },
-      }).catch(() => null);
-      if (resp && resp.ok) return stored;
-      sessionStorage.removeItem('da-token');
-    }
+    if (stored) return stored;
 
     // Try iframe postMessage
     const iframe = document.querySelector('#quick-edit-iframe, iframe[src*="da.live"]');
