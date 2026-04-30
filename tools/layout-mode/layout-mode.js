@@ -8,6 +8,9 @@ function applyLayoutModeUI() {
     .prosemirror-floating-toolbar {
       display: none !important;
     }
+    .quick-edit-publish {
+      display: none !important;
+    }
     .ProseMirror {
       cursor: default !important;
       caret-color: transparent !important;
