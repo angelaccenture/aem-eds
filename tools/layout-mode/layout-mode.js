@@ -1,5 +1,6 @@
 import { loadPage } from '../../scripts/scripts.js';
 import injectToolbarButtons from '../toolbar-buttons/toolbar-buttons.js';
+import { getBlockConfig, getSectionConfig } from './config-loader.js';
 
 function applyLayoutModeUI() {
   const style = document.createElement('style');
@@ -38,57 +39,129 @@ function applyLayoutModeUI() {
       display: flex;
       align-items: center;
       height: 32px;
+      gap: 4px;
+    }
+    .lm-action-btn {
+      border: none;
+      background: transparent;
+      color: #555;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      text-transform: capitalize;
+    }
+    .lm-action-btn:hover {
+      background: #f0f0f0;
+      color: #111;
     }
   `;
   document.head.appendChild(style);
 
-  let blockBar = null;
-  let sectionBar = null;
+  let contextBar = null;
 
-  function createBar(text) {
-    const bar = document.createElement('div');
-    bar.className = 'lm-context-bar';
-    bar.textContent = text;
-    document.body.appendChild(bar);
-    return bar;
+  function ensureBar() {
+    if (!contextBar) {
+      contextBar = document.createElement('div');
+      contextBar.className = 'lm-context-bar';
+      document.body.appendChild(contextBar);
+    }
+    return contextBar;
   }
 
-  function positionBar(bar, target) {
+  function positionBar(target) {
+    const bar = ensureBar();
     bar.style.display = 'flex';
     const rect = target.getBoundingClientRect();
     const barHeight = 32;
     let top = rect.top + window.scrollY - barHeight - 8;
     if (top < window.scrollY) top = rect.bottom + window.scrollY + 8;
     const left = Math.max(8, Math.min(
-      rect.left + (rect.width / 2) - 40,
-      window.innerWidth - 100,
+      rect.left + (rect.width / 2) - (bar.offsetWidth / 2),
+      window.innerWidth - bar.offsetWidth - 8,
     ));
     bar.style.top = `${top}px`;
     bar.style.left = `${left}px`;
   }
 
-  function showBlockBar(target) {
-    if (!blockBar) blockBar = createBar('');
-    const name = target.dataset.blockName || target.classList[0] || 'Block';
-    blockBar.textContent = name;
-    positionBar(blockBar, target);
+  function renderActions(config, label, target) {
+    const bar = ensureBar();
+    bar.innerHTML = '';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = label;
+    nameSpan.style.cssText = 'font-weight:600;margin-right:12px;';
+    bar.appendChild(nameSpan);
+
+    const actions = config.actions || [];
+    actions.forEach((action) => {
+      const btn = document.createElement('button');
+      btn.className = 'lm-action-btn';
+      btn.textContent = action;
+      btn.title = action;
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        handleAction(action, target);
+      });
+      bar.appendChild(btn);
+    });
   }
 
-  function showSectionBar(target) {
-    if (!sectionBar) sectionBar = createBar('Test Section');
-    positionBar(sectionBar, target);
+  function handleAction(action, target) {
+    switch (action) {
+      case 'move-up': {
+        const prev = target.previousElementSibling;
+        if (prev) prev.before(target);
+        positionBar(target);
+        break;
+      }
+      case 'move-down': {
+        const next = target.nextElementSibling;
+        if (next) next.after(target);
+        positionBar(target);
+        break;
+      }
+      case 'delete':
+        if (confirm('Delete this element?')) {
+          clearSelection();
+          target.remove();
+        }
+        break;
+      case 'duplicate': {
+        const clone = target.cloneNode(true);
+        target.after(clone);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  async function showBlockBar(target) {
+    const name = target.dataset.blockName || target.classList[0] || 'block';
+    const config = await getBlockConfig(name);
+    const label = config.label || name;
+    renderActions(config, label, target);
+    positionBar(target);
+  }
+
+  async function showSectionBar(target) {
+    const config = await getSectionConfig();
+    renderActions(config, 'Section', target);
+    positionBar(target);
   }
 
   function clearSelection() {
     document.querySelectorAll('.lm-selected-section, .lm-selected-block').forEach((el) => {
       el.classList.remove('lm-selected-section', 'lm-selected-block');
     });
-    if (blockBar) blockBar.style.display = 'none';
-    if (sectionBar) sectionBar.style.display = 'none';
+    if (contextBar) contextBar.style.display = 'none';
   }
 
   document.addEventListener('click', (e) => {
-    if ((blockBar && blockBar.contains(e.target)) || (sectionBar && sectionBar.contains(e.target))) return;
+    if (contextBar && contextBar.contains(e.target)) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (toolbar && toolbar.contains(e.target)) return;
 

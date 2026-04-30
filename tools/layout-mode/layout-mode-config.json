@@ -1,0 +1,100 @@
+{
+  "defaults": {
+    "blocks": {
+      "*": {
+        "actions": ["move-up", "move-down", "delete", "duplicate"]
+      },
+      "hero": {
+        "label": "Hero",
+        "variants": ["center", "dark"],
+        "properties": [
+          { "name": "style", "type": "select", "options": ["default", "center", "dark"] }
+        ]
+      },
+      "card": {
+        "label": "Card",
+        "variants": ["horizontal"],
+        "properties": [
+          { "name": "style", "type": "select", "options": ["default", "horizontal"] }
+        ]
+      },
+      "teaser": {
+        "label": "Teaser",
+        "variants": [],
+        "properties": []
+      },
+      "columns": {
+        "label": "Columns",
+        "variants": [],
+        "properties": []
+      },
+      "advanced-accordion": {
+        "label": "Accordion",
+        "variants": ["compact"],
+        "properties": [
+          { "name": "style", "type": "select", "options": ["default", "compact"] }
+        ]
+      },
+      "advanced-carousel": {
+        "label": "Carousel",
+        "variants": [],
+        "properties": []
+      },
+      "advanced-tabs": {
+        "label": "Tabs",
+        "variants": [],
+        "properties": []
+      }
+    },
+    "sections": {
+      "actions": ["add-block", "move-up", "move-down", "delete"],
+      "properties": [
+        { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
+        { "name": "grid", "type": "select", "options": ["none", "2", "3", "4", "5", "6"] },
+        { "name": "spacing", "type": "select", "options": ["none", "xs", "s", "m", "l", "xl", "xxl"] }
+      ]
+    }
+  },
+  "templates": {
+    "blog": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete"]
+        }
+      },
+      "sections": {
+        "properties": [
+          { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
+          { "name": "spacing", "type": "select", "options": ["none", "s", "m", "l"] }
+        ]
+      }
+    },
+    "homepage": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete", "duplicate", "add-block"]
+        },
+        "hero": {
+          "variants": ["center", "dark", "video"],
+          "properties": [
+            { "name": "style", "type": "select", "options": ["default", "center", "dark", "video"] }
+          ]
+        }
+      }
+    },
+    "product": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete", "duplicate"]
+        }
+      },
+      "sections": {
+        "properties": [
+          { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
+          { "name": "grid", "type": "select", "options": ["none", "2", "3", "4"] },
+          { "name": "spacing", "type": "select", "options": ["none", "s", "m", "l", "xl"] }
+        ]
+      }
+    }
+  }
+}
