@@ -758,7 +758,6 @@ function hideLoader() {
 }
 
 export default function init(payload) {
-  showLoader();
   const { search } = window.location;
   const ref = new URLSearchParams(search).get('layout-mode');
   let origin;
