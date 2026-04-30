@@ -31,6 +31,21 @@ function applyLayoutModeUI() {
       border: none !important;
       background: transparent !important;
     }
+    .ProseMirror p,
+    .ProseMirror h1,
+    .ProseMirror h2,
+    .ProseMirror h3,
+    .ProseMirror h4,
+    .ProseMirror h5,
+    .ProseMirror h6,
+    .ProseMirror li,
+    .ProseMirror a,
+    .ProseMirror span,
+    .ProseMirror img,
+    .ProseMirror picture {
+      outline: none !important;
+      border-color: transparent !important;
+    }
     .lm-hover-block {
       outline: 1.5px dashed #0078d4 !important;
       outline-offset: 2px;
