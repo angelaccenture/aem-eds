@@ -273,10 +273,20 @@ function applyLayoutModeUI() {
   }
 
   async function getDAToken() {
-    // Try to get token from DA's iframe via postMessage
+    // Check sessionStorage first
+    const stored = sessionStorage.getItem('da-token');
+    if (stored) {
+      const resp = await fetch('https://admin.da.live/list/angelaccenture/aem-eds', {
+        headers: { Authorization: `Bearer ${stored}` },
+      }).catch(() => null);
+      if (resp && resp.ok) return stored;
+      sessionStorage.removeItem('da-token');
+    }
+
+    // Try iframe postMessage
     const iframe = document.querySelector('#quick-edit-iframe, iframe[src*="da.live"]');
     if (iframe) {
-      return new Promise((resolve) => {
+      const token = await new Promise((resolve) => {
         const handler = (e) => {
           if (e.data?.type === 'token') {
             window.removeEventListener('message', handler);
@@ -285,20 +295,28 @@ function applyLayoutModeUI() {
         };
         window.addEventListener('message', handler);
         iframe.contentWindow.postMessage({ type: 'get-token' }, '*');
-        setTimeout(() => {
-          window.removeEventListener('message', handler);
-          resolve(null);
-        }, 2000);
+        setTimeout(() => { window.removeEventListener('message', handler); resolve(null); }, 2000);
       });
-    }
-    // Fallback: try fetching from DA auth endpoint (requires same-origin cookies)
-    try {
-      const resp = await fetch('https://admin.da.live/auth/me', { credentials: 'include' });
-      if (resp.ok) {
-        const data = await resp.json();
-        return data.token || data.tokenValue || null;
+      if (token) {
+        sessionStorage.setItem('da-token', token);
+        return token;
       }
-    } catch { /* ignore */ }
+    }
+
+    // Fallback: prompt the author
+    const input = prompt(
+      'DA token required to save changes.\n\n'
+      + 'To get your token:\n'
+      + '1. Go to da.live and sign in\n'
+      + '2. Open DevTools Console\n'
+      + '3. Run: copy((await (await fetch("https://admin.da.live/auth/me")).json()).token)\n'
+      + '4. Paste it here:',
+    );
+    if (input) {
+      const trimmed = input.trim();
+      sessionStorage.setItem('da-token', trimmed);
+      return trimmed;
+    }
     return null;
   }
 
