@@ -274,35 +274,28 @@ function applyLayoutModeUI() {
 
   function updateBlockHeader(target, blockName, availableOptions) {
     const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
-    const editor = target.closest('.ProseMirror');
-    if (!editor) return;
 
-    const tables = editor.querySelectorAll('table, .block-table, [class*="table"]');
-    tables.forEach((table) => {
-      const header = table.querySelector('td:first-child, th:first-child, .block-name');
-      if (!header) return;
-      const headerText = header.textContent.trim();
-      const baseName = headerText.replace(/\s*\(.*\)/, '');
-      if (baseName.toLowerCase().replace(/\s+/g, '-') === blockName) {
-        header.textContent = activeClasses.length
-          ? `${baseName} (${activeClasses.join(', ')})`
-          : baseName;
-      }
-    });
-
-    const daBlock = target.closest('[data-block-name]') || target;
-    const blockTable = daBlock.previousElementSibling;
-    if (blockTable) {
-      const cell = blockTable.querySelector('td, th, [contenteditable]');
-      if (cell) {
-        const text = cell.textContent.trim().replace(/\s*\(.*\)/, '');
-        if (text.toLowerCase().replace(/\s+/g, '-') === blockName) {
-          cell.textContent = activeClasses.length
-            ? `${text} (${activeClasses.join(', ')})`
-            : text;
+    // Strategy 1: Find the source div in ProseMirror and update its className
+    // DA's ProseMirror manages the source divs directly. The decorated block
+    // wraps the source, so we walk up to find the ProseMirror-managed element.
+    const pm = document.querySelector('.ProseMirror');
+    if (pm) {
+      // Find all divs in ProseMirror whose first class matches the block name
+      const sourceDivs = pm.querySelectorAll(`div.${blockName}`);
+      sourceDivs.forEach((sourceDiv) => {
+        // Build new className: blockName + active style classes
+        const newClasses = [blockName, ...activeClasses].join(' ');
+        if (sourceDiv.className !== newClasses) {
+          sourceDiv.className = newClasses;
         }
-      }
+      });
     }
+
+    // Strategy 2: Also update the decorated element's classList
+    const decorated = target.closest('[data-block-name]') || target;
+    availableOptions.forEach((cls) => {
+      decorated.classList.toggle(cls, activeClasses.includes(cls));
+    });
   }
 
   function renderActions(config, label, target) {
