@@ -252,6 +252,8 @@ function applyLayoutModeUI() {
     if (!contextBar) {
       contextBar = document.createElement('div');
       contextBar.className = 'lm-context-bar';
+    }
+    if (!document.body.contains(contextBar)) {
       document.body.appendChild(contextBar);
     }
     return contextBar;
@@ -383,7 +385,7 @@ function applyLayoutModeUI() {
         div.className = [blockName, ...activeClasses].join(' ');
       });
 
-      await fetch(sourceUrl, {
+      const putResp = await fetch(sourceUrl, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -391,6 +393,9 @@ function applyLayoutModeUI() {
         },
         body: doc.body.innerHTML,
       });
+      if (putResp.ok) {
+        window.location.reload();
+      }
     } catch (err) {
       console.error('Layout Mode: DA save failed:', err);
     } finally {
