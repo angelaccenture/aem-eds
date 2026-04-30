@@ -30,11 +30,25 @@ async function fetchDAOptions(path) {
     const resp = await fetch(`https://main--${repo}--${owner}.aem.page${path}.json`);
     if (!resp.ok) throw new Error(`DA fetch failed: ${resp.status}`);
     const json = await resp.json();
-    const options = json.data
-      ? json.data.map((row) => row.Value || row.value || row.Name || row.name || Object.values(row)[0])
-      : [];
-    daCache[path] = options;
-    return options;
+    if (!json.data) { daCache[path] = []; return []; }
+
+    const groups = [];
+    let currentGroup = null;
+    json.data.forEach((row) => {
+      const groupName = row.Group || row.group || '';
+      if (groupName) {
+        currentGroup = { group: groupName, options: [] };
+        groups.push(currentGroup);
+      }
+      if (!currentGroup) {
+        currentGroup = { group: '', options: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.options.push(row.Value || row.value || row.Name || row.name || Object.values(row)[0]);
+    });
+
+    daCache[path] = groups;
+    return groups;
   } catch {
     daCache[path] = [];
     return [];

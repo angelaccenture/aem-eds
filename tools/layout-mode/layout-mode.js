@@ -130,6 +130,14 @@ function applyLayoutModeUI() {
     .lm-classes-option:hover { background: #f5f5f5; }
     .lm-classes-option input { margin: 0; accent-color: #0078d4; }
     .lm-classes-option.active { font-weight: 600; }
+    .lm-classes-group {
+      padding: 8px 12px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #999;
+      letter-spacing: 0.5px;
+    }
     .lm-block-picker-overlay {
       display: none;
       position: fixed;
@@ -442,30 +450,39 @@ function applyLayoutModeUI() {
         const menu = document.createElement('div');
         menu.className = 'lm-classes-menu';
 
-        const options = prop.options || [];
-        if (options.length === 0) {
+        const groups = prop.options || [];
+        if (groups.length === 0) {
           const empty = document.createElement('div');
           empty.style.cssText = 'padding:8px 12px;font-size:12px;color:#999;';
           empty.textContent = 'No styles available';
           menu.appendChild(empty);
         }
-        options.forEach((cls) => {
-          const option = document.createElement('label');
-          option.className = 'lm-classes-option';
-          const isActive = target.classList.contains(cls);
-          if (isActive) option.classList.add('active');
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.checked = isActive;
-          checkbox.addEventListener('change', () => {
-            target.classList.toggle(cls, checkbox.checked);
-            option.classList.toggle('active', checkbox.checked);
-            updateBlockHeader(target, blockName, options);
+        const allOptions = groups.flatMap((g) => (Array.isArray(g) ? [g] : g.options || []));
+        groups.forEach((group) => {
+          if (group.group) {
+            const header = document.createElement('div');
+            header.className = 'lm-classes-group';
+            header.textContent = group.group;
+            menu.appendChild(header);
+          }
+          (group.options || []).forEach((cls) => {
+            const option = document.createElement('label');
+            option.className = 'lm-classes-option';
+            const isActive = target.classList.contains(cls);
+            if (isActive) option.classList.add('active');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isActive;
+            checkbox.addEventListener('change', () => {
+              target.classList.toggle(cls, checkbox.checked);
+              option.classList.toggle('active', checkbox.checked);
+              updateBlockHeader(target, blockName, allOptions);
+            });
+            const text = document.createElement('span');
+            text.textContent = cls;
+            option.append(checkbox, text);
+            menu.appendChild(option);
           });
-          const text = document.createElement('span');
-          text.textContent = cls;
-          option.append(checkbox, text);
-          menu.appendChild(option);
         });
 
         trigger.addEventListener('mousedown', (ev) => {
