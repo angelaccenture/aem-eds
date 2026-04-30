@@ -10,10 +10,26 @@ function applyLayoutModeUI() {
     }
     .ProseMirror {
       cursor: default !important;
+      caret-color: transparent !important;
     }
     .ProseMirror * {
       user-select: none !important;
       -webkit-user-select: none !important;
+    }
+    .ProseMirror:focus,
+    .ProseMirror *:focus {
+      outline: none !important;
+    }
+    .ProseMirror ::selection {
+      background: transparent !important;
+    }
+    .ProseMirror p.is-selected,
+    .ProseMirror .ProseMirror-selectednode,
+    .ProseMirror [data-active],
+    .ProseMirror .selectedCell {
+      outline: none !important;
+      border: none !important;
+      background: transparent !important;
     }
     .lm-selected-section {
       outline: 3px solid #0078d4 !important;
