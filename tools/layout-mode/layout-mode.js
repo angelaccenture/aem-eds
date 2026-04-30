@@ -356,7 +356,49 @@ function applyLayoutModeUI() {
     return { owner, repo, pagePath };
   }
 
-  async function updateBlockHeader(target, blockName, availableOptions) {
+  let saveInProgress = false;
+
+  async function persistToDA(blockName, activeClasses) {
+    if (saveInProgress) return;
+    saveInProgress = true;
+    try {
+      const { owner, repo, pagePath } = getDAInfo();
+      const token = await getDAToken();
+      if (!token) return;
+
+      const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
+
+      const getResp = await fetch(sourceUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!getResp.ok) return;
+      const html = await getResp.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const blockDivs = doc.querySelectorAll(`div.${blockName}`);
+      if (!blockDivs.length) return;
+
+      blockDivs.forEach((div) => {
+        div.className = [blockName, ...activeClasses].join(' ');
+      });
+
+      await fetch(sourceUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'text/html',
+        },
+        body: doc.body.innerHTML,
+      });
+    } catch (err) {
+      console.error('Layout Mode: DA save failed:', err);
+    } finally {
+      saveInProgress = false;
+    }
+  }
+
+  function updateBlockHeader(target, blockName, availableOptions) {
     const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
 
     // Update the visual (decorated) element immediately
@@ -365,45 +407,8 @@ function applyLayoutModeUI() {
       decorated.classList.toggle(cls, activeClasses.includes(cls));
     });
 
-    // Persist to DA: fetch source, modify block class, PUT back
-    // Auth: get token from DA's iframe via postMessage
-    try {
-      const { owner, repo, pagePath } = getDAInfo();
-      const token = await getDAToken();
-      if (!token) throw new Error('No DA token available');
-
-      const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
-
-      const getResp = await fetch(sourceUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!getResp.ok) throw new Error(`Failed to fetch source: ${getResp.status}`);
-      const html = await getResp.text();
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const blockDivs = doc.querySelectorAll(`div.${blockName}`);
-
-      if (!blockDivs.length) throw new Error(`Block div .${blockName} not found in source`);
-
-      blockDivs.forEach((div) => {
-        div.className = [blockName, ...activeClasses].join(' ');
-      });
-
-      const updatedHTML = doc.body.innerHTML;
-      const putResp = await fetch(sourceUrl, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'text/html',
-        },
-        body: updatedHTML,
-      });
-
-      if (!putResp.ok) throw new Error(`Failed to save: ${putResp.status}`);
-    } catch (err) {
-      console.error('Layout Mode: Failed to persist style change to DA:', err);
-    }
+    // Fire-and-forget DA save
+    persistToDA(blockName, activeClasses);
   }
 
   function renderActions(config, label, target) {
