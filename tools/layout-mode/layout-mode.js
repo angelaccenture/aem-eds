@@ -1,10 +1,19 @@
 import { loadPage } from '../../scripts/scripts.js';
 import injectToolbarButtons from '../toolbar-buttons/toolbar-buttons.js';
-import initContentEditor from '../content-editor/content-editor.js';
 
 function applyLayoutModeUI() {
   const style = document.createElement('style');
   style.textContent = `
+    .prosemirror-floating-toolbar {
+      display: none !important;
+    }
+    .ProseMirror {
+      cursor: default !important;
+    }
+    .ProseMirror * {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
     .lm-selected-section {
       outline: 3px solid #0078d4 !important;
       outline-offset: 2px;
@@ -85,19 +94,8 @@ function applyLayoutModeUI() {
 
     clearSelection();
 
-    const isText = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
-    if (isText) {
-      if (blockBar) blockBar.style.display = 'none';
-      if (sectionBar) sectionBar.style.display = 'none';
-      return;
-    }
-
-    if (toolbar) toolbar.style.display = 'none';
-
     const block = e.target.closest('[data-block-name]');
     if (block) {
-      e.stopImmediatePropagation();
-      if (toolbar) toolbar.style.display = 'none';
       block.classList.add('lm-selected-block');
       showBlockBar(block);
       return;
@@ -105,8 +103,6 @@ function applyLayoutModeUI() {
 
     const section = e.target.closest('.section');
     if (section) {
-      e.stopImmediatePropagation();
-      if (toolbar) toolbar.style.display = 'none';
       section.classList.add('lm-selected-section');
       showSectionBar(section);
     }
@@ -129,7 +125,6 @@ function addImportmap() {
 
 async function loadModule(origin, payload) {
   const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
-  initContentEditor();
   applyLayoutModeUI();
 
   const observer = new MutationObserver(injectToolbarButtons);
