@@ -27,11 +27,11 @@ async function fetchDAOptions(path) {
   if (daCache[path]) return daCache[path];
   try {
     const { owner, repo } = getHostParts();
-    const resp = await fetch(`https://admin.da.live/source/${owner}/${repo}${path}.json`);
+    const resp = await fetch(`https://main--${repo}--${owner}.aem.page${path}.json`);
     if (!resp.ok) throw new Error(`DA fetch failed: ${resp.status}`);
     const json = await resp.json();
     const options = json.data
-      ? json.data.map((row) => row.value || row.name || row.style || Object.values(row)[0])
+      ? json.data.map((row) => row.Value || row.value || row.Name || row.name || Object.values(row)[0])
       : [];
     daCache[path] = options;
     return options;
