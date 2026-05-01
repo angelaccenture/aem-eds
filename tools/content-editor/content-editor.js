@@ -532,14 +532,13 @@ export default function initContentEditor() {
     const inToolbar = toolbar.contains(e.target);
     const inEditor = editor.contains(e.target);
     const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
-    const hasOpenDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
 
-    if (inToolbar || inDialog || hasOpenDialog) return;
-
-    if (!inEditor) {
+    if (!inToolbar && !inEditor && !inDialog) {
       toolbar.style.display = 'none';
       return;
     }
+
+    if (!inEditor) return;
 
     const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
     if (!target) return;
