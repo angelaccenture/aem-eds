@@ -534,7 +534,7 @@ export default function initContentEditor() {
     const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
 
     if (!inToolbar && !inEditor && !inDialog) {
-      toolbar.style.display = 'none';
+     // toolbar.style.display = 'none';
       console.log("This console");
        console.log(inToolbar);
         console.log(inEditor);
