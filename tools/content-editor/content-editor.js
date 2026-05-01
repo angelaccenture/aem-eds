@@ -126,6 +126,8 @@ function addStyles() {
 }
 
 
+let toolbarActive = false;
+
 function detectImage(rawTarget) {
   const img = rawTarget.closest('img, picture, svg, video, canvas, [class*="image"], [class*="img"]');
   if (img) return img;
@@ -172,6 +174,9 @@ function injectFormattingToolbar() {
     b.innerHTML = svg;
     b.addEventListener('mousedown', (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      toolbarActive = true;
+      setTimeout(() => { toolbarActive = false; }, 1000);
       action();
     });
     return b;
@@ -555,15 +560,6 @@ export default function initContentEditor() {
     toolbar.style.top = `${top}px`;
     toolbar.style.left = `${left}px`;
   });
-
-  let toolbarActive = false;
-  document.addEventListener('mousedown', (e) => {
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (toolbar && toolbar.contains(e.target)) {
-      toolbarActive = true;
-      setTimeout(() => { toolbarActive = false; }, 500);
-    }
-  }, true);
 
   document.addEventListener('selectionchange', () => {
     if (toolbarActive) return;
