@@ -535,6 +535,7 @@ export default function initContentEditor() {
 
     if (!inToolbar && !inEditor && !inDialog) {
       toolbar.style.display = 'none';
+      console.log("This console");
       return;
     }
 
