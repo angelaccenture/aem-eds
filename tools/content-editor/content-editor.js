@@ -427,11 +427,6 @@ function injectFormattingToolbar() {
     </div>
   `;
 
-  imageDialog.querySelector('#qe-img-alt').addEventListener('input', (ev) => {
-    ev.target.style.borderColor = '';
-    ev.target.placeholder = 'Describe this image...';
-  });
-
   imageDialog.querySelector('.palette-btn-cancel').addEventListener('click', () => {
     imageDialog.classList.remove('open');
   });
@@ -442,13 +437,6 @@ function injectFormattingToolbar() {
     const url = imageDialog.querySelector('#qe-img-url').value;
     const alt = imageDialog.querySelector('#qe-img-alt').value || '';
     if (!url) { imageDialog.classList.remove('open'); return; }
-    if (!alt) {
-      const altInput = imageDialog.querySelector('#qe-img-alt');
-      altInput.style.borderColor = '#d32f2f';
-      altInput.placeholder = 'Alt text is required';
-      altInput.focus();
-      return;
-    }
     if (editingImg) {
       editingImg.src = url;
       editingImg.alt = alt;
@@ -492,12 +480,9 @@ function injectFormattingToolbar() {
   });
 
   document.addEventListener('click', (e) => {
-    if (!imageDialog.classList.contains('open')) return;
-    if (imageDialog.contains(e.target)) return;
-    if (imageBtn && imageBtn.contains(e.target)) return;
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (toolbar && toolbar.contains(e.target)) return;
-    imageDialog.classList.remove('open');
+    if (imageDialog.classList.contains('open') && !imageDialog.contains(e.target) && !imageBtn.contains(e.target)) {
+      imageDialog.classList.remove('open');
+    }
   });
 
   // Expose for image click handler
@@ -543,7 +528,7 @@ export default function initContentEditor() {
     if (!toolbar) return;
 
     const inToolbar = toolbar.contains(e.target);
-    const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar, .lm-classes-menu');
+    const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
     if (inToolbar || inDialog) return;
 
     const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
@@ -566,22 +551,9 @@ export default function initContentEditor() {
     toolbar.style.left = `${left}px`;
   });
 
-  let toolbarInteracting = false;
-
-  document.addEventListener('mousedown', (e) => {
-    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (toolbar && toolbar.contains(e.target)) {
-      toolbarInteracting = true;
-      setTimeout(() => { toolbarInteracting = false; }, 500);
-    }
-  }, true);
-
   document.addEventListener('selectionchange', () => {
-    if (toolbarInteracting) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (!toolbar) return;
-    const hasOpenDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
-    if (hasOpenDialog) return;
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
