@@ -566,7 +566,18 @@ export default function initContentEditor() {
     toolbar.style.left = `${left}px`;
   });
 
+  let toolbarInteracting = false;
+
+  document.addEventListener('mousedown', (e) => {
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (toolbar && toolbar.contains(e.target)) {
+      toolbarInteracting = true;
+      setTimeout(() => { toolbarInteracting = false; }, 500);
+    }
+  }, true);
+
   document.addEventListener('selectionchange', () => {
+    if (toolbarInteracting) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (!toolbar) return;
     const hasOpenDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
