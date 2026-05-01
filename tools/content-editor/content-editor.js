@@ -561,19 +561,30 @@ export default function initContentEditor() {
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (toolbar && toolbar.contains(e.target)) {
       toolbarActive = true;
-      setTimeout(() => { toolbarActive = false; }, 500);
+      setTimeout(() => { toolbarActive = false; }, 1000);
     }
   }, true);
 
-  document.addEventListener('selectionchange', () => {
-    if (toolbarActive) return;
+  // Override DA's native toolbar hiding when we need it visible
+  const toolbarStyleObserver = new MutationObserver((mutations) => {
+    mutations.forEach((m) => {
+      if (m.attributeName !== 'style') return;
+      const toolbar = m.target;
+      if (toolbar.style.display === 'none') {
+        const hasDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
+        if (toolbarActive || hasDialog) {
+          toolbar.style.display = 'block';
+        }
+      }
+    });
+  });
+
+  const waitForToolbar = new MutationObserver(() => {
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (!toolbar) return;
-    const hasDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
-    if (hasDialog) return;
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount || sel.isCollapsed) {
-      const editor = document.querySelector('.ProseMirror');
+    if (toolbar) {
+      toolbarStyleObserver.observe(toolbar, { attributes: true, attributeFilter: ['style'] });
+      waitForToolbar.disconnect();
     }
   });
+  waitForToolbar.observe(document.body, { childList: true, subtree: true });
 }
