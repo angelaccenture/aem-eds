@@ -409,19 +409,30 @@ function applyLayoutModeUI() {
 
 
   async function saveAllChanges() {
-    if (!Object.keys(pendingChanges).length && !structureChanged) return;
+    if (!Object.keys(pendingChanges).length && !structureChanged) {
+      console.warn('Layout Mode: No changes to save');
+      return;
+    }
     const token = await getDAToken();
-    if (!token) return;
+    if (!token) {
+      alert('No DA token available. Please try again.');
+      return;
+    }
 
     try {
       const { owner, repo, pagePath } = getDAInfo();
       const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
+      console.log('Layout Mode: Fetching source from', sourceUrl);
 
       const getResp = await fetch(sourceUrl, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!getResp.ok) return;
+      if (!getResp.ok) {
+        alert(`Failed to fetch source: ${getResp.status}`);
+        return;
+      }
       let html = await getResp.text();
+      console.log('Layout Mode: Source fetched, length:', html.length);
 
       // Apply style changes via string replacement
       Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
@@ -461,6 +472,7 @@ function applyLayoutModeUI() {
         html = wrapper.innerHTML;
       }
 
+      console.log('Layout Mode: Saving to DA, length:', html.length);
       const putResp = await fetch(sourceUrl, {
         method: 'PUT',
         headers: {
@@ -470,10 +482,14 @@ function applyLayoutModeUI() {
         body: html,
       });
       if (putResp.ok) {
+        console.log('Layout Mode: Save successful, reloading');
         window.location.reload();
+      } else {
+        alert(`Save failed: ${putResp.status}`);
       }
     } catch (err) {
       console.error('Layout Mode: DA save failed:', err);
+      alert(`Save error: ${err.message}`);
     }
   }
 
