@@ -203,6 +203,21 @@ function applyLayoutModeUI() {
       color: #0078d4;
     }
     .lm-block-picker-item.hidden { display: none; }
+    .lm-block-picker-group {
+      padding: 10px 12px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #999;
+      letter-spacing: 0.5px;
+      list-style: none;
+    }
+    .lm-block-picker-empty {
+      padding: 12px;
+      font-size: 13px;
+      color: #999;
+      list-style: none;
+    }
     .lm-block-picker-actions {
       display: flex;
       justify-content: flex-end;
@@ -602,30 +617,67 @@ function applyLayoutModeUI() {
     });
   }
 
-  const BLOCK_LIST = [
-    { name: 'Hero', value: 'hero' },
-    { name: 'Hero (Center)', value: 'hero center' },
-    { name: 'Card', value: 'card' },
-    { name: 'Teaser', value: 'teaser' },
-    { name: 'Section-Metadata', value: 'section-metadata' },
-    { name: 'Columns', value: 'columns' },
-    { name: 'Metadata', value: 'metadata' },
-    { name: 'Table', value: 'table' },
-    { name: 'Advanced Accordion', value: 'advanced-accordion' },
-    { name: 'Advanced Carousel', value: 'advanced-carousel' },
-    { name: 'Advanced Tabs', value: 'advanced-tabs' },
-    { name: 'YouTube', value: 'youtube' },
-    { name: 'Fragment', value: 'fragment' },
-  ];
+  let blockListCache = null;
+
+  async function fetchBlockList() {
+    if (blockListCache) return blockListCache;
+    try {
+      let { hostname } = window.location;
+      if (hostname === 'localhost') {
+        const meta = document.querySelector('meta[property="hlx:proxyUrl"]');
+        if (meta) hostname = meta.content;
+      }
+      const parts = hostname.split('.')[0].split('--');
+      const [, repo, owner] = parts;
+      const resp = await fetch(`https://main--${repo}--${owner}.aem.page/docs/library/block-list.json`);
+      if (!resp.ok) throw new Error('Failed to fetch block list');
+      const json = await resp.json();
+      if (!json.data) return [];
+
+      const groups = [];
+      let currentGroup = null;
+      json.data.forEach((row) => {
+        const groupName = row.Group || row.group || '';
+        if (groupName) {
+          currentGroup = { group: groupName, items: [] };
+          groups.push(currentGroup);
+        }
+        if (!currentGroup) {
+          currentGroup = { group: '', items: [] };
+          groups.push(currentGroup);
+        }
+        currentGroup.items.push({
+          name: row.Name || row.name || row.Value || row.value,
+          value: row.Value || row.value || row.Name || row.name,
+        });
+      });
+      blockListCache = groups;
+      return groups;
+    } catch {
+      blockListCache = [];
+      return [];
+    }
+  }
 
   let pickerOverlay = null;
   let pickerTarget = null;
   let pickerSelected = null;
 
-  function createBlockPicker() {
+  async function createBlockPicker() {
+    const groups = await fetchBlockList();
+    let listHTML = '';
+    groups.forEach((group) => {
+      if (group.group) {
+        listHTML += `<li class="lm-block-picker-group">${group.group}</li>`;
+      }
+      group.items.forEach((b) => {
+        listHTML += `<li class="lm-block-picker-item" data-value="${b.value}">${b.name}</li>`;
+      });
+    });
+    if (!listHTML) listHTML = '<li class="lm-block-picker-empty">No blocks available</li>';
+
     pickerOverlay = document.createElement('div');
     pickerOverlay.className = 'lm-block-picker-overlay';
-    const listHTML = BLOCK_LIST.map((b) => `<li class="lm-block-picker-item" data-value="${b.value}">${b.name}</li>`).join('');
     pickerOverlay.innerHTML = `
       <div class="lm-block-picker">
         <span class="lm-block-picker-title">Insert block</span>
@@ -688,8 +740,8 @@ function applyLayoutModeUI() {
     pickerOverlay.querySelectorAll('.lm-block-picker-item').forEach((i) => i.classList.remove('hidden'));
   }
 
-  function openBlockPicker(section) {
-    if (!pickerOverlay) createBlockPicker();
+  async function openBlockPicker(section) {
+    if (!pickerOverlay) await createBlockPicker();
     pickerTarget = section;
     pickerOverlay.classList.add('open');
     setTimeout(() => pickerOverlay.querySelector('.lm-block-picker-search').focus(), 50);
