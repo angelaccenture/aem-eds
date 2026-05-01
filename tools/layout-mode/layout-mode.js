@@ -538,7 +538,7 @@ function applyLayoutModeUI() {
           empty.textContent = 'No styles available';
           menu.appendChild(empty);
         }
-        const allOptions = groups.flatMap((g) => (Array.isArray(g) ? [g] : g.options || []));
+        const allValues = groups.flatMap((g) => (g.options || []).map((o) => (typeof o === 'string' ? o : o.value)));
         groups.forEach((group) => {
           if (group.group) {
             const header = document.createElement('div');
@@ -546,7 +546,9 @@ function applyLayoutModeUI() {
             header.textContent = group.group;
             menu.appendChild(header);
           }
-          (group.options || []).forEach((cls) => {
+          (group.options || []).forEach((opt) => {
+            const cls = typeof opt === 'string' ? opt : opt.value;
+            const displayName = typeof opt === 'string' ? opt : opt.name;
             const option = document.createElement('label');
             option.className = 'lm-classes-option';
             const isActive = target.classList.contains(cls);
@@ -557,10 +559,10 @@ function applyLayoutModeUI() {
             checkbox.addEventListener('change', () => {
               target.classList.toggle(cls, checkbox.checked);
               option.classList.toggle('active', checkbox.checked);
-              updateBlockHeader(target, blockName, allOptions);
+              updateBlockHeader(target, blockName, allValues);
             });
             const text = document.createElement('span');
-            text.textContent = cls;
+            text.textContent = displayName;
             option.append(checkbox, text);
             menu.appendChild(option);
           });

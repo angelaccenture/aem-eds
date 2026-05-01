@@ -44,7 +44,10 @@ async function fetchDAOptions(path) {
         currentGroup = { group: '', options: [] };
         groups.push(currentGroup);
       }
-      currentGroup.options.push(row.Value || row.value || row.Name || row.name || Object.values(row)[0]);
+      currentGroup.options.push({
+        name: row.Name || row.name || row.Value || row.value || Object.values(row)[0],
+        value: row.Value || row.value || row.Name || row.name || Object.values(row)[0],
+      });
     });
 
     daCache[path] = groups;
