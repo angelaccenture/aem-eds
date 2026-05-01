@@ -349,6 +349,8 @@ function injectFormattingToolbar() {
   });
 
   const linkBtn = btn(svgs.link, 'Add Link', () => {
+    const tb = document.querySelector('.prosemirror-floating-toolbar');
+    if (tb) tb.style.setProperty('display', 'flex', 'important');
     const sel = window.getSelection();
     if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
 
@@ -475,6 +477,8 @@ function injectFormattingToolbar() {
   }
 
   const imageBtn = btn(svgs.image, 'Insert Image', () => {
+    const tb = document.querySelector('.prosemirror-floating-toolbar');
+    if (tb) tb.style.setProperty('display', 'flex', 'important');
     const sel = window.getSelection();
     if (sel.rangeCount) savedSelection = sel.getRangeAt(0).cloneRange();
     openImageDialog(imageBtn, null);
