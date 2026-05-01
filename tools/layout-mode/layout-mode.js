@@ -373,6 +373,20 @@ function applyLayoutModeUI() {
   }
 
   const pendingChanges = {};
+  const pendingOps = [];
+
+  function getBlockIndex(target) {
+    const main = document.querySelector('main');
+    const sections = [...main.querySelectorAll(':scope > .section, :scope > div')];
+    const section = target.closest('.section');
+    const sectionIdx = sections.indexOf(section);
+    if (target.classList.contains('section') || target === section) {
+      return { type: 'section', index: sectionIdx };
+    }
+    const blocks = [...(section?.querySelectorAll('[data-block-name]') || [])];
+    const blockIdx = blocks.indexOf(target.closest('[data-block-name]') || target);
+    return { type: 'block', sectionIndex: sectionIdx, index: blockIdx };
+  }
 
   function updateBlockHeader(target, blockName, availableOptions) {
     const activeClasses = availableOptions.filter((cls) => target.classList.contains(cls));
@@ -393,31 +407,40 @@ function applyLayoutModeUI() {
     if (saveBtn) saveBtn.classList.add('has-changes');
   }
 
-  function serializeCurrentPage() {
-    const main = document.querySelector('main');
-    if (!main) return '';
-    const clone = main.cloneNode(true);
+  function applyOpsToSource(doc) {
+    const sections = [...doc.body.querySelectorAll(':scope > div')];
 
-    // Remove layout-mode UI elements
-    clone.querySelectorAll('.lm-context-bar, .lm-classes-menu, .lm-hover-block, .lm-hover-section').forEach((el) => el.remove());
-    clone.querySelectorAll('[class*="lm-selected"]').forEach((el) => {
-      el.classList.remove('lm-selected-block', 'lm-selected-section');
+    pendingOps.forEach((op) => {
+      const currentSections = [...doc.body.querySelectorAll(':scope > div')];
+      if (op.type === 'section') {
+        const el = currentSections[op.index];
+        if (!el) return;
+        if (op.action === 'move-up' && op.index > 0) {
+          currentSections[op.index - 1].before(el);
+        } else if (op.action === 'move-down' && op.index < currentSections.length - 1) {
+          currentSections[op.index + 1].after(el);
+        } else if (op.action === 'delete') {
+          el.remove();
+        } else if (op.action === 'duplicate') {
+          el.after(el.cloneNode(true));
+        }
+      } else if (op.type === 'block') {
+        const section = currentSections[op.sectionIndex];
+        if (!section) return;
+        const blocks = [...section.children];
+        const el = blocks[op.index];
+        if (!el) return;
+        if (op.action === 'move-up' && op.index > 0) {
+          blocks[op.index - 1].before(el);
+        } else if (op.action === 'move-down' && op.index < blocks.length - 1) {
+          blocks[op.index + 1].after(el);
+        } else if (op.action === 'delete') {
+          el.remove();
+        } else if (op.action === 'duplicate') {
+          el.after(el.cloneNode(true));
+        }
+      }
     });
-
-    // Strip EDS decoration wrappers back to source structure
-    clone.querySelectorAll('.section').forEach((section) => {
-      section.classList.remove('section');
-      section.removeAttribute('data-status');
-    });
-    clone.querySelectorAll('.block-content, .default-content').forEach((wrapper) => {
-      wrapper.replaceWith(...wrapper.childNodes);
-    });
-    clone.querySelectorAll('[data-block-name]').forEach((el) => {
-      el.removeAttribute('data-block-name');
-      el.removeAttribute('data-status');
-    });
-
-    return clone.innerHTML;
   }
 
   async function saveAllChanges() {
@@ -429,29 +452,25 @@ function applyLayoutModeUI() {
       const { owner, repo, pagePath } = getDAInfo();
       const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
 
-      let updatedHTML;
+      const getResp = await fetch(sourceUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!getResp.ok) return;
+      const html = await getResp.text();
 
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Apply style changes
+      Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
+        doc.body.querySelectorAll(`div.${blockName}`).forEach((div) => {
+          div.className = [blockName, ...activeClasses].join(' ');
+        });
+      });
+
+      // Apply structural operations
       if (structureChanged) {
-        // Full page serialize — structure was modified
-        updatedHTML = serializeCurrentPage();
-      } else {
-        // Only class changes — patch the source
-        const getResp = await fetch(sourceUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!getResp.ok) return;
-        const html = await getResp.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
-          doc.querySelectorAll(`div.${blockName}`).forEach((div) => {
-            div.className = [blockName, ...activeClasses].join(' ');
-          });
-        });
-
-        updatedHTML = doc.body.innerHTML;
+        applyOpsToSource(doc);
       }
 
       const putResp = await fetch(sourceUrl, {
@@ -460,7 +479,7 @@ function applyLayoutModeUI() {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'text/html',
         },
-        body: updatedHTML,
+        body: doc.body.innerHTML,
       });
       if (putResp.ok) {
         window.location.reload();
@@ -665,12 +684,15 @@ function applyLayoutModeUI() {
   }
 
   function handleAction(action, target) {
+    const pos = getBlockIndex(target);
+
     switch (action) {
       case 'move-up': {
         const prev = target.previousElementSibling;
         if (prev && !prev.classList.contains('lm-context-bar')) {
           prev.before(target);
           positionBar(target);
+          pendingOps.push({ ...pos, action: 'move-up' });
           markStructureChanged();
         }
         break;
@@ -680,12 +702,14 @@ function applyLayoutModeUI() {
         if (next && !next.classList.contains('lm-context-bar')) {
           next.after(target);
           positionBar(target);
+          pendingOps.push({ ...pos, action: 'move-down' });
           markStructureChanged();
         }
         break;
       }
       case 'delete':
         if (confirm('Delete this element?')) {
+          pendingOps.push({ ...pos, action: 'delete' });
           clearSelection();
           target.remove();
           markStructureChanged();
@@ -695,6 +719,7 @@ function applyLayoutModeUI() {
         const clone = target.cloneNode(true);
         clone.classList.remove('lm-selected-block', 'lm-selected-section');
         target.after(clone);
+        pendingOps.push({ ...pos, action: 'duplicate' });
         markStructureChanged();
         break;
       }
