@@ -427,6 +427,11 @@ function injectFormattingToolbar() {
     </div>
   `;
 
+  imageDialog.querySelector('#qe-img-alt').addEventListener('input', (ev) => {
+    ev.target.style.borderColor = '';
+    ev.target.placeholder = 'Describe this image...';
+  });
+
   imageDialog.querySelector('.palette-btn-cancel').addEventListener('click', () => {
     imageDialog.classList.remove('open');
   });
@@ -437,6 +442,13 @@ function injectFormattingToolbar() {
     const url = imageDialog.querySelector('#qe-img-url').value;
     const alt = imageDialog.querySelector('#qe-img-alt').value || '';
     if (!url) { imageDialog.classList.remove('open'); return; }
+    if (!alt) {
+      const altInput = imageDialog.querySelector('#qe-img-alt');
+      altInput.style.borderColor = '#d32f2f';
+      altInput.placeholder = 'Alt text is required';
+      altInput.focus();
+      return;
+    }
     if (editingImg) {
       editingImg.src = url;
       editingImg.alt = alt;
