@@ -24,7 +24,7 @@ function addStyles() {
       border-radius: 4px !important;
       padding: 2px 6px !important;
       box-shadow: 0 1px 4px rgb(0 0 0 / 6%) !important;
-      display: flex !important;
+      display: flex;
       align-items: center !important;
       gap: 0 !important;
       height: 32px !important;
