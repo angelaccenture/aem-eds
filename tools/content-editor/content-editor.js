@@ -557,9 +557,21 @@ export default function initContentEditor() {
     toolbar.style.left = `${left}px`;
   });
 
+  let toolbarActive = false;
+  document.addEventListener('mousedown', (e) => {
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (toolbar && toolbar.contains(e.target)) {
+      toolbarActive = true;
+      setTimeout(() => { toolbarActive = false; }, 500);
+    }
+  }, true);
+
   document.addEventListener('selectionchange', () => {
+    if (toolbarActive) return;
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (!toolbar) return;
+    const hasDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
+    if (hasDialog) return;
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
