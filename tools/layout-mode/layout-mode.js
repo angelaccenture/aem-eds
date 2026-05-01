@@ -834,9 +834,18 @@ function injectSaveButton() {
   saveBtn.className = 'lm-save-btn';
   saveBtn.textContent = 'Save';
   saveBtn.addEventListener('click', async () => {
-    if (!saveBtn.classList.contains('has-changes')) return;
+    if (!saveBtn.classList.contains('has-changes')) {
+      alert('No changes detected');
+      return;
+    }
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving...';
+    if (!window._lmSaveAllChanges) {
+      alert('Save function not ready');
+      saveBtn.textContent = 'Save';
+      saveBtn.disabled = false;
+      return;
+    }
     await window._lmSaveAllChanges();
     saveBtn.textContent = 'Save';
     saveBtn.disabled = false;
