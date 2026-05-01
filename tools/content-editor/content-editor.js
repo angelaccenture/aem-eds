@@ -24,6 +24,7 @@ function addStyles() {
       border-radius: 4px !important;
       padding: 2px 6px !important;
       box-shadow: 0 1px 4px rgb(0 0 0 / 6%) !important;
+      display: flex !important;
       align-items: center !important;
       gap: 0 !important;
       height: 32px !important;
@@ -525,19 +526,24 @@ export default function initContentEditor() {
 
   document.addEventListener('click', (e) => {
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
-    if (!toolbar) return;
+    const editor = document.querySelector('.ProseMirror');
+    if (!toolbar || !editor) return;
 
     const inToolbar = toolbar.contains(e.target);
+    const inEditor = editor.contains(e.target);
     const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
-    if (inToolbar || inDialog) return;
 
-    const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
-    if (!target) {
-      toolbar.style.setProperty('display', 'none', 'important');
+    if (!inToolbar && !inEditor && !inDialog) {
+      toolbar.style.display = 'none';
       return;
     }
 
-    toolbar.style.setProperty('display', 'flex', 'important');
+    if (!inEditor) return;
+
+    const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
+    if (!target) return;
+
+    toolbar.style.display = 'block';
     const rect = target.getBoundingClientRect();
     const toolbarHeight = toolbar.offsetHeight || 32;
     let top = rect.top + window.scrollY - toolbarHeight - 8;
@@ -558,7 +564,7 @@ export default function initContentEditor() {
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
       if (!editor || !editor.contains(sel?.anchorNode)) {
-        toolbar.style.setProperty('display', 'none', 'important');
+        toolbar.style.display = 'none';
       }
     }
   });
