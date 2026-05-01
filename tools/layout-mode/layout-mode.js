@@ -393,8 +393,35 @@ function applyLayoutModeUI() {
     if (saveBtn) saveBtn.classList.add('has-changes');
   }
 
+  function serializeCurrentPage() {
+    const main = document.querySelector('main');
+    if (!main) return '';
+    const clone = main.cloneNode(true);
+
+    // Remove layout-mode UI elements
+    clone.querySelectorAll('.lm-context-bar, .lm-classes-menu, .lm-hover-block, .lm-hover-section').forEach((el) => el.remove());
+    clone.querySelectorAll('[class*="lm-selected"]').forEach((el) => {
+      el.classList.remove('lm-selected-block', 'lm-selected-section');
+    });
+
+    // Strip EDS decoration wrappers back to source structure
+    clone.querySelectorAll('.section').forEach((section) => {
+      section.classList.remove('section');
+      section.removeAttribute('data-status');
+    });
+    clone.querySelectorAll('.block-content, .default-content').forEach((wrapper) => {
+      wrapper.replaceWith(...wrapper.childNodes);
+    });
+    clone.querySelectorAll('[data-block-name]').forEach((el) => {
+      el.removeAttribute('data-block-name');
+      el.removeAttribute('data-status');
+    });
+
+    return clone.innerHTML;
+  }
+
   async function saveAllChanges() {
-    if (!Object.keys(pendingChanges).length) return;
+    if (!Object.keys(pendingChanges).length && !structureChanged) return;
     const token = await getDAToken();
     if (!token) return;
 
@@ -402,20 +429,30 @@ function applyLayoutModeUI() {
       const { owner, repo, pagePath } = getDAInfo();
       const sourceUrl = `https://admin.da.live/source/${owner}/${repo}${pagePath}.html`;
 
-      const getResp = await fetch(sourceUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!getResp.ok) return;
-      const html = await getResp.text();
+      let updatedHTML;
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
-        doc.querySelectorAll(`div.${blockName}`).forEach((div) => {
-          div.className = [blockName, ...activeClasses].join(' ');
+      if (structureChanged) {
+        // Full page serialize — structure was modified
+        updatedHTML = serializeCurrentPage();
+      } else {
+        // Only class changes — patch the source
+        const getResp = await fetch(sourceUrl, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-      });
+        if (!getResp.ok) return;
+        const html = await getResp.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
+          doc.querySelectorAll(`div.${blockName}`).forEach((div) => {
+            div.className = [blockName, ...activeClasses].join(' ');
+          });
+        });
+
+        updatedHTML = doc.body.innerHTML;
+      }
 
       const putResp = await fetch(sourceUrl, {
         method: 'PUT',
@@ -423,7 +460,7 @@ function applyLayoutModeUI() {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'text/html',
         },
-        body: doc.body.innerHTML,
+        body: updatedHTML,
       });
       if (putResp.ok) {
         window.location.reload();
@@ -620,29 +657,45 @@ function applyLayoutModeUI() {
     setTimeout(() => pickerOverlay.querySelector('.lm-block-picker-search').focus(), 50);
   }
 
+  let structureChanged = false;
+
+  function markStructureChanged() {
+    structureChanged = true;
+    showSaveButton();
+  }
+
   function handleAction(action, target) {
     switch (action) {
       case 'move-up': {
         const prev = target.previousElementSibling;
-        if (prev) prev.before(target);
-        positionBar(target);
+        if (prev && !prev.classList.contains('lm-context-bar')) {
+          prev.before(target);
+          positionBar(target);
+          markStructureChanged();
+        }
         break;
       }
       case 'move-down': {
         const next = target.nextElementSibling;
-        if (next) next.after(target);
-        positionBar(target);
+        if (next && !next.classList.contains('lm-context-bar')) {
+          next.after(target);
+          positionBar(target);
+          markStructureChanged();
+        }
         break;
       }
       case 'delete':
         if (confirm('Delete this element?')) {
           clearSelection();
           target.remove();
+          markStructureChanged();
         }
         break;
       case 'duplicate': {
         const clone = target.cloneNode(true);
+        clone.classList.remove('lm-selected-block', 'lm-selected-section');
         target.after(clone);
+        markStructureChanged();
         break;
       }
       case 'add-block':
