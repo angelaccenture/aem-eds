@@ -580,7 +580,8 @@ export default function initContentEditor() {
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
       if (!editor || !editor.contains(sel?.anchorNode)) {
-        toolbar.style.display = 'none';
+        console.log("what is this doing?");
+        //toolbar.style.display = 'none';
       }
     }
   });
