@@ -533,15 +533,6 @@ export default function initContentEditor() {
     const inEditor = editor.contains(e.target);
     const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
 
-    if (!inToolbar && !inEditor && !inDialog) {
-     // toolbar.style.display = 'none';
-      console.log("This console");
-       console.log(inToolbar);
-        console.log(inEditor);
-         console.log(inDialog);
-      return;
-    }
-
     if (!inEditor) return;
 
     const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
@@ -579,10 +570,6 @@ export default function initContentEditor() {
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
-      if (!editor || !editor.contains(sel?.anchorNode)) {
-        console.log("what is this doing?");
-        //toolbar.style.display = 'none';
-      }
     }
   });
 }
