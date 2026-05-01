@@ -820,7 +820,7 @@ function injectSaveButton() {
 
   // Hide publish button in layout-mode
   const publishBtn = buttonsBar.querySelector('.quick-edit-publish');
-  if (publishBtn) publishBtn.style.display = 'none';
+  if (publishBtn) publishBtn.style.setProperty('display', 'none', 'important');
 
   const style = document.createElement('style');
   style.textContent = `
