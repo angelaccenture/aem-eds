@@ -383,9 +383,11 @@ function applyLayoutModeUI() {
     if (target.classList.contains('section') || target === section) {
       return { type: 'section', index: sectionIdx };
     }
-    const blocks = [...(section?.querySelectorAll('[data-block-name]') || [])];
-    const blockIdx = blocks.indexOf(target.closest('[data-block-name]') || target);
-    return { type: 'block', sectionIndex: sectionIdx, index: blockIdx };
+    const block = target.closest('[data-block-name]') || target;
+    const blockName = block.dataset.blockName || block.classList[0];
+    const sameNameBlocks = [...(section?.querySelectorAll(`[data-block-name="${blockName}"]`) || [])];
+    const nthOfName = sameNameBlocks.indexOf(block);
+    return { type: 'block', sectionIndex: sectionIdx, blockName, nthOfName };
   }
 
   function updateBlockHeader(target, blockName, availableOptions) {
@@ -459,11 +461,13 @@ function applyLayoutModeUI() {
           } else if (op.type === 'block') {
             const section = currentSections[op.sectionIndex];
             if (!section) return;
-            const children = [...section.children];
-            const el = children[op.index];
+            const matching = [...section.querySelectorAll(`div.${op.blockName}`)];
+            const el = matching[op.nthOfName];
             if (!el) return;
-            if (op.action === 'move-up' && op.index > 0) children[op.index - 1].before(el);
-            else if (op.action === 'move-down' && op.index < children.length - 1) children[op.index + 1].after(el);
+            const prev = el.previousElementSibling;
+            const next = el.nextElementSibling;
+            if (op.action === 'move-up' && prev) prev.before(el);
+            else if (op.action === 'move-down' && next) next.after(el);
             else if (op.action === 'delete') el.remove();
             else if (op.action === 'duplicate') el.after(el.cloneNode(true));
           }
