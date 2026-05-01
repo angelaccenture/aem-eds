@@ -407,41 +407,6 @@ function applyLayoutModeUI() {
     if (saveBtn) saveBtn.classList.add('has-changes');
   }
 
-  function applyOpsToSource(doc) {
-    const sections = [...doc.body.querySelectorAll(':scope > div')];
-
-    pendingOps.forEach((op) => {
-      const currentSections = [...doc.body.querySelectorAll(':scope > div')];
-      if (op.type === 'section') {
-        const el = currentSections[op.index];
-        if (!el) return;
-        if (op.action === 'move-up' && op.index > 0) {
-          currentSections[op.index - 1].before(el);
-        } else if (op.action === 'move-down' && op.index < currentSections.length - 1) {
-          currentSections[op.index + 1].after(el);
-        } else if (op.action === 'delete') {
-          el.remove();
-        } else if (op.action === 'duplicate') {
-          el.after(el.cloneNode(true));
-        }
-      } else if (op.type === 'block') {
-        const section = currentSections[op.sectionIndex];
-        if (!section) return;
-        const blocks = [...section.children];
-        const el = blocks[op.index];
-        if (!el) return;
-        if (op.action === 'move-up' && op.index > 0) {
-          blocks[op.index - 1].before(el);
-        } else if (op.action === 'move-down' && op.index < blocks.length - 1) {
-          blocks[op.index + 1].after(el);
-        } else if (op.action === 'delete') {
-          el.remove();
-        } else if (op.action === 'duplicate') {
-          el.after(el.cloneNode(true));
-        }
-      }
-    });
-  }
 
   async function saveAllChanges() {
     if (!Object.keys(pendingChanges).length && !structureChanged) return;
@@ -456,21 +421,44 @@ function applyLayoutModeUI() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!getResp.ok) return;
-      const html = await getResp.text();
+      let html = await getResp.text();
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      // Apply style changes
+      // Apply style changes via string replacement
       Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
-        doc.body.querySelectorAll(`div.${blockName}`).forEach((div) => {
-          div.className = [blockName, ...activeClasses].join(' ');
-        });
+        const newClass = [blockName, ...activeClasses].join(' ');
+        const regex = new RegExp(`class="${blockName}[^"]*"`, 'g');
+        html = html.replace(regex, `class="${newClass}"`);
       });
 
-      // Apply structural operations
+      // Apply structural operations by parsing, modifying, and re-serializing
       if (structureChanged) {
-        applyOpsToSource(doc);
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        const sections = [...wrapper.querySelectorAll(':scope > div')];
+
+        pendingOps.forEach((op) => {
+          const currentSections = [...wrapper.querySelectorAll(':scope > div')];
+          if (op.type === 'section') {
+            const el = currentSections[op.index];
+            if (!el) return;
+            if (op.action === 'move-up' && op.index > 0) currentSections[op.index - 1].before(el);
+            else if (op.action === 'move-down' && op.index < currentSections.length - 1) currentSections[op.index + 1].after(el);
+            else if (op.action === 'delete') el.remove();
+            else if (op.action === 'duplicate') el.after(el.cloneNode(true));
+          } else if (op.type === 'block') {
+            const section = currentSections[op.sectionIndex];
+            if (!section) return;
+            const children = [...section.children];
+            const el = children[op.index];
+            if (!el) return;
+            if (op.action === 'move-up' && op.index > 0) children[op.index - 1].before(el);
+            else if (op.action === 'move-down' && op.index < children.length - 1) children[op.index + 1].after(el);
+            else if (op.action === 'delete') el.remove();
+            else if (op.action === 'duplicate') el.after(el.cloneNode(true));
+          }
+        });
+
+        html = wrapper.innerHTML;
       }
 
       const putResp = await fetch(sourceUrl, {
@@ -479,7 +467,7 @@ function applyLayoutModeUI() {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'text/html',
         },
-        body: doc.body.innerHTML,
+        body: html,
       });
       if (putResp.ok) {
         window.location.reload();
