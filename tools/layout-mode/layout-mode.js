@@ -399,8 +399,14 @@ function applyLayoutModeUI() {
       decorated.classList.toggle(cls, activeClasses.includes(cls));
     });
 
-    // Track change for save
-    pendingChanges[blockName] = activeClasses;
+    // Find which nth instance of this block name we're targeting
+    const section = target.closest('.section');
+    const sameNameBlocks = [...(section?.querySelectorAll(`[data-block-name="${blockName}"]`) || [])];
+    const nthOfName = sameNameBlocks.indexOf(decorated);
+
+    // Track change for save — keyed by name + nth
+    const key = `${blockName}:${nthOfName}`;
+    pendingChanges[key] = { blockName, nthOfName, activeClasses };
     showSaveButton();
   }
 
@@ -436,18 +442,21 @@ function applyLayoutModeUI() {
       let html = await getResp.text();
       console.log('Layout Mode: Source fetched, length:', html.length);
 
-      // Apply style changes via string replacement
-      Object.entries(pendingChanges).forEach(([blockName, activeClasses]) => {
-        const newClass = [blockName, ...activeClasses].join(' ');
-        const regex = new RegExp(`class="${blockName}[^"]*"`, 'g');
-        html = html.replace(regex, `class="${newClass}"`);
+      // Parse source into a wrapper for manipulation
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+
+      // Apply style changes — target specific nth instance of each block
+      Object.values(pendingChanges).forEach(({ blockName, nthOfName, activeClasses }) => {
+        const matching = [...wrapper.querySelectorAll(`div.${blockName}`)];
+        const el = matching[nthOfName];
+        if (el) {
+          el.className = [blockName, ...activeClasses].join(' ');
+        }
       });
 
-      // Apply structural operations by parsing, modifying, and re-serializing
+      // Apply structural operations
       if (structureChanged) {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        const sections = [...wrapper.querySelectorAll(':scope > div')];
 
         pendingOps.forEach((op) => {
           const currentSections = [...wrapper.querySelectorAll(':scope > div')];
@@ -473,9 +482,9 @@ function applyLayoutModeUI() {
           }
         });
 
-        html = wrapper.innerHTML;
       }
 
+      html = wrapper.innerHTML;
       console.log('Layout Mode: Saving to DA, length:', html.length);
       const putResp = await fetch(sourceUrl, {
         method: 'PUT',
