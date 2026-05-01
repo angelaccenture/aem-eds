@@ -569,6 +569,8 @@ export default function initContentEditor() {
   document.addEventListener('selectionchange', () => {
     const toolbar = document.querySelector('.prosemirror-floating-toolbar');
     if (!toolbar) return;
+    const hasOpenDialog = document.querySelector('.da-page-dialog.open, .qe-dropdown-menu.open');
+    if (hasOpenDialog) return;
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount || sel.isCollapsed) {
       const editor = document.querySelector('.ProseMirror');
