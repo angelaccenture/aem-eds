@@ -18,27 +18,36 @@ For projects that want a few more batteries. Built by the team who brought you d
 1. Open the `{repo}` folder in your favorite code editor and buil something.
 1. **Recommended:** Install common npm packages like linting and testing: `npm i`.
 
-### Page
-A page is what holds your content. It can be styled using a metadata property called `template` which will load styles that apply to the entire page.
+### Quick Edit (content):
+* Allows authors to edit the text items, change text structure (like Heading tags, bold, italics, etc.) with standard Text Editor
+* Allows authors to edit the image and its alt text
+* Authors can change edit modes (Quick Edit, DA, Layout Mode)
+* Authorable SEO page properties details
+* Various customizable publish workflows
+* Tag Manager
 
-### Template Details
-* Start by creating your own templates or customizing the existing ones within the /templates folder
+### Layout Mode:
+* Advanced Authors can create editable styles for the blocks (within library/styles), then select styles within dropdown for block
+* Authors can move blocks up and down, delete them, duplicate blocks
+* Authors can add blocks into a section, change grid, styles, background
+
+### Templates
+* Create templates or customizing the existing ones within the /templates folder
+* Add header/footer, any other required blocks for structure
 * Use the .css and .js file to create the base structure
-* Define which blocks can be added by the author - this might be done in DA
-* Define which styles can be added by the author - this might be done in DA
-* Use DA to create the initial structure of template
-
-
-
-
+* Define which blocks can be added by the author
+* Use DA to create the initial structure
 
 ### Style System
-* Angel to figure out best way
+* Developers add styles within the blocks CSS, then Authors add the styles to the sheets within /docs/library/styles that will appear within layout mode dropdown.  These are editable based on the template
+* Developers create template driven styles within /template.css files for structure
 
 
 
 ## Patterns
 
+### Page
+A page is what holds your content. It can be styled using a metadata property called `template` which will load styles that apply to the entire page.
 
 ### Section
 A section is a sub-section of your page. It can be styled using a `section-metadata` block. A section will control the layout of blocks.
@@ -52,35 +61,7 @@ An auto block is a block generated from a pre-defined piece of content. Often ti
 ### Default content
 Default content is content that lives outside a block.
 
-## Design System
-
-### Spacing & Gap
-XS, S, M, L, XL, XXL
-
-### Emphasis
-quiet, default, strong, negative
-
-### Buttons
-accent, primary, secondary, negative
-(w/ outline variations)
-
-### Columns
-1 - 12
-
-### Grid
-1 - 6
-
-### Color tokens
-blue, gray, green, magenta, organge, red, purple, yellow
-(w/ 100-900 variations)
-
-### Color schemes
-light, dark
-
-
-
-
-## Features
+## Additional Features
 
 ### Localization & globalization
 * Language only support - Ex: en, de, hi, ja
