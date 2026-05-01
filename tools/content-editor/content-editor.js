@@ -492,9 +492,12 @@ function injectFormattingToolbar() {
   });
 
   document.addEventListener('click', (e) => {
-    if (imageDialog.classList.contains('open') && !imageDialog.contains(e.target) && !imageBtn.contains(e.target)) {
-      imageDialog.classList.remove('open');
-    }
+    if (!imageDialog.classList.contains('open')) return;
+    if (imageDialog.contains(e.target)) return;
+    if (imageBtn && imageBtn.contains(e.target)) return;
+    const toolbar = document.querySelector('.prosemirror-floating-toolbar');
+    if (toolbar && toolbar.contains(e.target)) return;
+    imageDialog.classList.remove('open');
   });
 
   // Expose for image click handler
@@ -540,7 +543,7 @@ export default function initContentEditor() {
     if (!toolbar) return;
 
     const inToolbar = toolbar.contains(e.target);
-    const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar');
+    const inDialog = e.target.closest('.da-page-dialog, .qe-dropdown-menu, .qe-edit-menu, .qe-publish-overlay, .lm-context-bar, .lm-classes-menu');
     if (inToolbar || inDialog) return;
 
     const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, li, a, span, img, picture');
