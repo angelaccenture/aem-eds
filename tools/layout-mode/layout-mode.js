@@ -629,7 +629,19 @@ function applyLayoutModeUI() {
       }
       const parts = hostname.split('.')[0].split('--');
       const [, repo, owner] = parts;
-      const resp = await fetch(`https://main--${repo}--${owner}.aem.page/docs/library/block-list.json`);
+      const baseUrl = `https://main--${repo}--${owner}.aem.page/docs/library/block-list`;
+
+      // Check for template-specific block list first
+      const templateMeta = document.head.querySelector('meta[name="template"]');
+      const template = templateMeta ? templateMeta.content.toLowerCase().replace(/\s+/g, '-') : null;
+
+      let resp;
+      if (template) {
+        resp = await fetch(`${baseUrl}/${template}.json`);
+      }
+      if (!resp || !resp.ok) {
+        resp = await fetch(`${baseUrl}/default.json`);
+      }
       if (!resp.ok) throw new Error('Failed to fetch block list');
       const json = await resp.json();
       if (!json.data) return [];
