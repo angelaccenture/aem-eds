@@ -9,18 +9,27 @@
 .blog-template main {
   max-width: calc(10% + 1200px);
   margin: 0 auto;
-  padding: 0 12px 24px;
+  padding: 36px 12px 24px;
 }
 
 /* ---- Sections (white card areas) ---- */
 .blog-template main > .section {
   background-color: #fff;
-  margin-top: 36px;
   padding: 0 24px 40px;
 }
 
 .blog-template main > .section:first-child {
   padding-top: 0;
+}
+
+/* ---- Two-column grid (article 2:1 sidebar) ---- */
+@media (width >= 900px) {
+  .blog-template main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
 }
 
 /* ---- Typography ---- */
