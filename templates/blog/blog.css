@@ -1,5 +1,29 @@
 /* Blog template — Microsoft blog style */
 
+/* ---- Page Layout ---- */
+.blog-template {
+  background-color: #f5f5f5;
+  color: #2f2f2f;
+}
+
+.blog-template main {
+  max-width: calc(10% + 1200px);
+  margin: 0 auto;
+  padding: 0 12px 24px;
+}
+
+/* ---- Sections (white card areas) ---- */
+.blog-template main > .section {
+  background-color: #fff;
+  margin-top: 36px;
+  padding: 0 24px 40px;
+}
+
+.blog-template main > .section:first-child {
+  padding-top: 0;
+}
+
+/* ---- Typography ---- */
 .blog-template h1 {
   font-size: 34px;
   font-weight: 100;
