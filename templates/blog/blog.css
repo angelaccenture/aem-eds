@@ -1,1 +1,18 @@
+/* Blog template — Microsoft blog style */
 
+.blog-template h1 {
+  font-size: 34px;
+  font-weight: 100;
+  line-height: 40px;
+  color: #2f2f2f;
+  margin: 0;
+  padding: 38px 0 2px;
+  font-family: "Segoe UI", SegoeUI, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@media (width >= 900px) {
+  .blog-template h1 {
+    font-size: 46px;
+    line-height: 52px;
+  }
+}
